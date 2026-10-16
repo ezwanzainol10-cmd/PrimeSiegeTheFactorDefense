@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zero Countdown Math Hoops</title>
+    <title>Zero Countdown: Skydiver Math Dropper</title>
     <style>
         body {
             margin: 0;
             background: #0f172a;
-            color: #fff;
-            font-family: sans-serif;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -21,26 +21,30 @@
         }
         canvas {
             border: 4px solid #334155;
-            background: #1e293b;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            border-radius: 8px;
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
         #ui {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 20px;
+            left: 20px;
             font-size: 18px;
             font-weight: bold;
             font-family: monospace;
-            text-shadow: 2px 2px 4px #000;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             pointer-events: none;
+        }
+        .score-text {
+            color: #38bdf8;
         }
     </style>
 </head>
 <body>
 
 <div id="gameContainer">
-    <div id="ui">TARGETS HIT: <span id="scoreVal">0</span></div>
-    <canvas id="gameCanvas" width="450" height="600"></canvas>
+    <div id="ui">MISSIONS_COMPLETED: <span id="scoreVal" class="score-text">0</span></div>
+    <canvas id="gameCanvas" width="450" height="650"></canvas>
 </div>
 
 <script>
@@ -48,77 +52,65 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreVal = document.getElementById("scoreVal");
 
-// Game configurations
+// Game State Variables
 let score = 0;
 let gameOver = false;
 let gameOverReason = "";
 let gameSpeed = 2.5;
 let targetNumber = 0;
 
-// Prime number pool
-const primePool =;
+// Set of prime numbers used to build puzzles
+const primePool = [2, 3, 5, 7, 11, 13];
 
-// Player configuration with speed variables
+// 4-Way Playable Skydiver Entity Configuration
 const player = {
     x: canvas.width / 2,
-    y: 120,
-    radius: 20, // Expanded slightly to fit double digits easily
+    y: 150,
+    radius: 20, // Circular bounding radius for collision detection
     speed: 6,
     vx: 0,
     vy: 0
 };
 
-// Key controls tracking
+// Keyboard Input Listeners
 const keys = {};
 window.addEventListener("keydown", e => keys[e.code] = true);
 window.addEventListener("keyup", e => keys[e.code] = false);
 
-// Hoops configurations
+// Floating Math Hoops Grid Management
 let hoops = [];
-const hoopHeight = 15;
-const hoopWidth = 75;
-const hoopSpacing = 165; 
+const hoopHeight = 16;
+const hoopWidth = 85;
+const hoopSpacing = 180; 
 
-// Generate a target number constructed cleanly by summing up a sequence of primes from our pool
+// Generates a target value built from adding a sequence of random primes
 function generateTargetNumber() {
-    let internalSum = 0;
-    // Chain 2 to 4 random primes together to create the subtraction sequence puzzle
-    let steps = Math.floor(Math.random() * 3) + 2; 
-    
-    for(let i = 0; i < steps; i++) {
-        internalSum += primePool[Math.floor(Math.random() * primePool.length)];
+    let sum = 0;
+    // Chain 2 to 4 random primes together to configure the subtraction goal
+    let sequenceLength = Math.floor(Math.random() * 3) + 2; 
+    for(let i = 0; i < sequenceLength; i++) {
+        sum += primePool[Math.floor(Math.random() * primePool.length)];
     }
-    return internalSum;
+    return sum;
 }
 
+// Spawns a row featuring a pair of path options (left vs right)
 function spawnHoopRow(yPosition) {
-    // Pick one safe prime option that doesn't force the target below 0 instantly
-    let safePrimes = primePool.filter(p => targetNumber - p >= 0);
+    // Locate a prime that won't forcefully drop the target below zero instantly
+    let viableOptions = primePool.filter(p => targetNumber - p >= 0);
+    let correctPrime = viableOptions.length > 0 ? viableOptions[Math.floor(Math.random() * viableOptions.length)] : 2;
     
-    // If no primes can cleanly keep it >= 0, just offer a random small pool choice as fallback
-    let correctPrime = safePrimes.length > 0 ? safePrimes[Math.floor(Math.random() * safePrimes.length)] : primePool[0];
-    
-    // Choose a decoy prime
-    let wrongPrimes = primePool.filter(p => p !== correctPrime);
-    let wrongPrime = wrongPrimes[Math.floor(Math.random() * wrongPrimes.length)];
+    // Pick an incorrect decoy prime option
+    let decoys = primePool.filter(p => p !== correctPrime);
+    let wrongPrime = decoys[Math.floor(Math.random() * decoys.length)];
 
-    let sideElement = Math.random() > 0.5;
-    let primeLeft = sideElement ? correctPrime : wrongPrime;
-    let primeRight = sideElement ? wrongPrime : correctPrime;
+    // Randomize whether the correct prime is on the left side or right side
+    let assignLeft = Math.random() > 0.5;
+    let valueLeft = assignLeft ? correctPrime : wrongPrime;
+    let valueRight = assignLeft ? wrongPrime : correctPrime;
 
-    hoops.push({
-        x: 50,
-        y: yPosition,
-        value: primeLeft,
-        passed: false
-    });
-
-    hoops.push({
-        x: canvas.width - 50 - hoopWidth,
-        y: yPosition,
-        value: primeRight,
-        passed: false
-    });
+    hoops.push({ x: 40, y: yPosition, value: valueLeft, passed: false });
+    hoops.push({ x: canvas.width - 40 - hoopWidth, y: yPosition, value: valueRight, passed: false });
 }
 
 function resetGame() {
@@ -127,7 +119,7 @@ function resetGame() {
     gameOverReason = "";
     gameSpeed = 2.5;
     player.x = canvas.width / 2;
-    player.y = 120;
+    player.y = 150;
     player.vx = 0;
     player.vy = 0;
     hoops = [];
@@ -135,41 +127,87 @@ function resetGame() {
     targetNumber = generateTargetNumber();
     scoreVal.innerText = score;
 
+    // Prefill the scrolling void with the initial rows
     for (let i = 0; i < 4; i++) {
-        spawnHoopRow(canvas.height + 40 + i * hoopSpacing);
+        spawnHoopRow(canvas.height + 20 + i * hoopSpacing);
     }
     requestAnimationFrame(update);
 }
 
+// Visual Engine: Draws a 2D custom vector skydiver sprite
+function drawSkydiver(ctx, x, y) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // 1. Altimeter Equipment Pack (The Backpack containing the number)
+    ctx.fillStyle = "#cbd5e1";
+    ctx.fillRect(-18, -15, 36, 28);
+    ctx.strokeStyle = "#475569";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-18, -15, 36, 28);
+
+    // 2. Flight Torso Suit
+    ctx.fillStyle = "#0284c7"; // Sky blue base jumpsuit
+    ctx.fillRect(-12, -8, 24, 26);
+
+    // 3. Sprawled Out Stabilizing Arms (Skydiving posture)
+    ctx.fillStyle = "#bae6fd";
+    ctx.fillRect(-22, -6, 10, 8);  // Left arm extension
+    ctx.fillRect(12, -6, 10, 8);   // Right arm extension
+    
+    // Trailing Lower Stabilizing Legs
+    ctx.fillStyle = "#0284c7";
+    ctx.fillRect(-14, 18, 7, 14);  // Left leg profile
+    ctx.fillRect(7, 18, 7, 14);   // Right leg profile
+
+    // 4. Safety Visor Helmet Structure (Head)
+    ctx.fillStyle = "#ef4444"; // Vibrant red structural dome
+    ctx.beginPath();
+    ctx.arc(0, -20, 11, 0, Math.PI * 2);
+    ctx.fill();
+
+    // High altitude protective visor glass screen
+    ctx.fillStyle = "#22d3ee";
+    ctx.fillRect(-7, -22, 14, 6);
+
+    // 5. Draw the Countdown Value right on the Diver's Backpack display
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 14px monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(targetNumber, 0, 0);
+
+    ctx.restore();
+}
+
 function update() {
     if (gameOver) {
-        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.fillStyle = gameOverReason.includes("WIN") ? "#22c55e" : "#f43f5e";
-        ctx.font = "bold 32px sans-serif";
+        ctx.font = "bold 30px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(gameOverReason.includes("WIN") ? "SUCCESS!" : "GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+        ctx.fillText(gameOverReason.includes("WIN") ? "MISSION SUCCESS!" : "CRASHED", canvas.width / 2, canvas.height / 2 - 30);
         
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "16px sans-serif";
-        ctx.fillText(gameOverReason, canvas.width / 2, canvas.height / 2);
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "16px monospace";
+        ctx.fillText(gameOverReason, canvas.width / 2, canvas.height / 2 + 15);
         
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "#ffffff";
         ctx.font = "14px sans-serif";
-        ctx.fillText("Press SPACE to start next loop", canvas.width / 2, canvas.height / 2 + 50);
+        ctx.fillText("Press SPACEBAR to dive again", canvas.width / 2, canvas.height / 2 + 70);
         
         if (keys["Space"]) resetGame();
         else requestAnimationFrame(update);
         return;
     }
 
-    // Horizontal Controls
+    // 1. Process 4-Way Axis Movement Controls
     if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = -player.speed;
     else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = player.speed;
     else player.vx = 0;
 
-    // Vertical Controls (Fully functional flying up/down)
     if (keys["ArrowUp"] || keys["KeyW"]) player.vy = -player.speed;
     else if (keys["ArrowDown"] || keys["KeyS"]) player.vy = player.speed;
     else player.vy = 0;
@@ -177,105 +215,72 @@ function update() {
     player.x += player.vx;
     player.y += player.vy;
 
-    // Simulate passive camera drift down if vertical movement idle
+    // Apply constant background gravity atmospheric scroll if player isn't actively flying up/down
     if (player.vy === 0) {
         player.y += gameSpeed * 0.35;
     }
 
-    // Canvas boundary safety limits
+    // Lock position values inside structural screen boundary frames
     if (player.x - player.radius < 0) player.x = player.radius;
     if (player.x + player.radius > canvas.width) player.x = canvas.width - player.radius;
     if (player.y - player.radius < 0) player.y = player.radius;
     if (player.y + player.radius > canvas.height) player.y = canvas.height - player.radius;
 
-    // Track hoop positions and check clean overlaps
+    // 2. Iterate and Check Interactions with Floating Hoops
     for (let i = 0; i < hoops.length; i++) {
         let h = hoops[i];
-        h.y -= gameSpeed; 
+        h.y -= gameSpeed; // Hoops float upward to simulate falling down
 
-        if (!h.passed && player.y + player.radius >= h.y && player.y - player.radius <= h.y + hoopHeight) {
+        // Hitbox collision verification logic: checks if player circle passes through hoop horizontal lane
+        if (!h.passed && player.y + 12 >= h.y && player.y - 12 <= h.y + hoopHeight) {
             if (player.x > h.x && player.x < h.x + hoopWidth) {
                 h.passed = true;
                 
-                // Disable sister hoop block
+                // Mute paired lane sibling hoop from registering dual hits
                 let sibling = hoops.find(o => o !== h && Math.abs(o.y - h.y) < 5);
                 if (sibling) sibling.passed = true;
 
-                // Execute Math subtraction action rule updates
+                // Subtract hoop value from your backpack number
                 targetNumber -= h.value;
 
                 if (targetNumber === 0) {
                     score++;
                     scoreVal.innerText = score;
-                    gameSpeed += 0.2;
+                    gameSpeed += 0.3; // Speed scales up as score increments
                     gameOver = true;
-                    gameOverReason = "YOU HIT EXACTLY ZERO! YOU WIN!";
+                    gameOverReason = "BACKPACK COUNTDOWN TARGET HIT EXACTLY 0!";
                     return;
                 } else if (targetNumber < 0) {
                     gameOver = true;
-                    gameOverReason = `Oops! Dropped below zero down to ${targetNumber}!`;
+                    gameOverReason = `Failed! Dropped past zero into negative numbers (${targetNumber})!`;
                     return;
                 }
             }
         }
     }
 
-    // Cycle fresh rows
-    if (hoops.length > 0 && hoops.y < -hoopHeight) {
-        hoops.shift(); 
-        hoops.shift(); 
-        
+    // Clean out old expired top rows and generate next pair ahead below the screen
+    if (hoops.length > 0 && hoops[0].y < -hoopHeight) {
+        hoops.shift(); // Remove left hoop
+        hoops.shift(); // Remove right hoop
         let lastItemY = hoops.length > 0 ? hoops[hoops.length - 1].y : canvas.height;
         spawnHoopRow(lastItemY + hoopSpacing);
     }
 
-    // Map boundaries crash triggers
+    // 3. Map Hazard Edge Collisions
     if (player.y - player.radius <= 0) {
         gameOver = true;
-        gameOverReason = "You crashed into the ceiling!";
+        gameOverReason = "Diver swept away out the top ceiling framework!";
     }
     if (player.y + player.radius >= canvas.height) {
         gameOver = true;
-        gameOverReason = "You dropped out the bottom floor!";
+        gameOverReason = "Ground impact! Failed to stabilize countdown target in time.";
     }
 
-    // Canvas Rendering Loops
+    // 4. Graphical Rendering Engine Pipeline
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw active Hoop lanes
+    // Render Neon Passing Gate Portals
     hoops.forEach(h => {
-        ctx.fillStyle = "#38bdf8"; 
+        ctx.fillStyle = "#f59e0b"; // Bright amber structural rings
         ctx.fillRect(h.x - 6, h.y, 6, hoopHeight);
-        ctx.fillRect(h.x + hoopWidth, h.y, 6, hoopHeight);
-        
-        ctx.fillStyle = "rgba(56, 189, 248, 0.12)";
-        ctx.fillRect(h.x, h.y, hoopWidth, hoopHeight);
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 16px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("-" + h.value, h.x + (hoopWidth / 2), h.y - 6); // Displays math tag cleanly
-    });
-
-    // Draw Avatar Ball
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "#fbbf24"; 
-    ctx.fill();
-    ctx.closePath();
-
-    // Render active countdown number state on player character
-    ctx.fillStyle = "#0f172a"; 
-    ctx.font = "bold 15px monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(targetNumber, player.x, player.y);
-
-    requestAnimationFrame(update);
-}
-
-resetGame();
-</script>
-
-</body>
-</html>
