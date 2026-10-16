@@ -59,14 +59,14 @@ let gameOverReason = "";
 let gameSpeed = 2.5;
 let targetNumber = 0;
 
-// Set of prime numbers used to build puzzles
-const primePool = [2, 3, 5, 7, 11, 13];
+// Restored Prime Number Pool array
+const primePool =;
 
 // 4-Way Playable Skydiver Entity Configuration
 const player = {
     x: canvas.width / 2,
     y: 150,
-    radius: 20, // Circular bounding radius for collision detection
+    radius: 20,
     speed: 6,
     vx: 0,
     vy: 0
@@ -83,10 +83,8 @@ const hoopHeight = 16;
 const hoopWidth = 85;
 const hoopSpacing = 180; 
 
-// Generates a target value built from adding a sequence of random primes
 function generateTargetNumber() {
     let sum = 0;
-    // Chain 2 to 4 random primes together to configure the subtraction goal
     let sequenceLength = Math.floor(Math.random() * 3) + 2; 
     for(let i = 0; i < sequenceLength; i++) {
         sum += primePool[Math.floor(Math.random() * primePool.length)];
@@ -94,17 +92,13 @@ function generateTargetNumber() {
     return sum;
 }
 
-// Spawns a row featuring a pair of path options (left vs right)
 function spawnHoopRow(yPosition) {
-    // Locate a prime that won't forcefully drop the target below zero instantly
     let viableOptions = primePool.filter(p => targetNumber - p >= 0);
     let correctPrime = viableOptions.length > 0 ? viableOptions[Math.floor(Math.random() * viableOptions.length)] : 2;
     
-    // Pick an incorrect decoy prime option
     let decoys = primePool.filter(p => p !== correctPrime);
     let wrongPrime = decoys[Math.floor(Math.random() * decoys.length)];
 
-    // Randomize whether the correct prime is on the left side or right side
     let assignLeft = Math.random() > 0.5;
     let valueLeft = assignLeft ? correctPrime : wrongPrime;
     let valueRight = assignLeft ? wrongPrime : correctPrime;
@@ -127,14 +121,12 @@ function resetGame() {
     targetNumber = generateTargetNumber();
     scoreVal.innerText = score;
 
-    // Prefill the scrolling void with the initial rows
     for (let i = 0; i < 4; i++) {
         spawnHoopRow(canvas.height + 20 + i * hoopSpacing);
     }
     requestAnimationFrame(update);
 }
 
-// Visual Engine: Draws a 2D custom vector skydiver sprite
 function drawSkydiver(ctx, x, y) {
     ctx.save();
     ctx.translate(x, y);
@@ -147,21 +139,21 @@ function drawSkydiver(ctx, x, y) {
     ctx.strokeRect(-18, -15, 36, 28);
 
     // 2. Flight Torso Suit
-    ctx.fillStyle = "#0284c7"; // Sky blue base jumpsuit
+    ctx.fillStyle = "#0284c7"; 
     ctx.fillRect(-12, -8, 24, 26);
 
-    // 3. Sprawled Out Stabilizing Arms (Skydiving posture)
+    // 3. Sprawled Out Stabilizing Arms
     ctx.fillStyle = "#bae6fd";
-    ctx.fillRect(-22, -6, 10, 8);  // Left arm extension
-    ctx.fillRect(12, -6, 10, 8);   // Right arm extension
+    ctx.fillRect(-22, -6, 10, 8);  
+    ctx.fillRect(12, -6, 10, 8);   
     
     // Trailing Lower Stabilizing Legs
     ctx.fillStyle = "#0284c7";
-    ctx.fillRect(-14, 18, 7, 14);  // Left leg profile
-    ctx.fillRect(7, 18, 7, 14);   // Right leg profile
+    ctx.fillRect(-14, 18, 7, 14);  
+    ctx.fillRect(7, 18, 7, 14);   
 
-    // 4. Safety Visor Helmet Structure (Head)
-    ctx.fillStyle = "#ef4444"; // Vibrant red structural dome
+    // 4. Safety Visor Helmet Structure
+    ctx.fillStyle = "#ef4444"; 
     ctx.beginPath();
     ctx.arc(0, -20, 11, 0, Math.PI * 2);
     ctx.fill();
@@ -203,7 +195,7 @@ function update() {
         return;
     }
 
-    // 1. Process 4-Way Axis Movement Controls
+    // 4-Way Controls
     if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = -player.speed;
     else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = player.speed;
     else player.vx = 0;
@@ -215,72 +207,81 @@ function update() {
     player.x += player.vx;
     player.y += player.vy;
 
-    // Apply constant background gravity atmospheric scroll if player isn't actively flying up/down
     if (player.vy === 0) {
         player.y += gameSpeed * 0.35;
     }
 
-    // Lock position values inside structural screen boundary frames
     if (player.x - player.radius < 0) player.x = player.radius;
     if (player.x + player.radius > canvas.width) player.x = canvas.width - player.radius;
     if (player.y - player.radius < 0) player.y = player.radius;
     if (player.y + player.radius > canvas.height) player.y = canvas.height - player.radius;
 
-    // 2. Iterate and Check Interactions with Floating Hoops
     for (let i = 0; i < hoops.length; i++) {
         let h = hoops[i];
-        h.y -= gameSpeed; // Hoops float upward to simulate falling down
+        h.y -= gameSpeed; 
 
-        // Hitbox collision verification logic: checks if player circle passes through hoop horizontal lane
         if (!h.passed && player.y + 12 >= h.y && player.y - 12 <= h.y + hoopHeight) {
             if (player.x > h.x && player.x < h.x + hoopWidth) {
                 h.passed = true;
                 
-                // Mute paired lane sibling hoop from registering dual hits
                 let sibling = hoops.find(o => o !== h && Math.abs(o.y - h.y) < 5);
                 if (sibling) sibling.passed = true;
 
-                // Subtract hoop value from your backpack number
                 targetNumber -= h.value;
 
                 if (targetNumber === 0) {
                     score++;
                     scoreVal.innerText = score;
-                    gameSpeed += 0.3; // Speed scales up as score increments
+                    gameSpeed += 0.3; 
                     gameOver = true;
                     gameOverReason = "BACKPACK COUNTDOWN TARGET HIT EXACTLY 0!";
                     return;
                 } else if (targetNumber < 0) {
                     gameOver = true;
-                    gameOverReason = `Failed! Dropped past zero into negative numbers (${targetNumber})!`;
+                    gameOverReason = `Failed! Dropped past zero to (${targetNumber})!`;
                     return;
                 }
             }
         }
     }
 
-    // Clean out old expired top rows and generate next pair ahead below the screen
     if (hoops.length > 0 && hoops[0].y < -hoopHeight) {
-        hoops.shift(); // Remove left hoop
-        hoops.shift(); // Remove right hoop
+        hoops.shift(); 
+        hoops.shift(); 
         let lastItemY = hoops.length > 0 ? hoops[hoops.length - 1].y : canvas.height;
         spawnHoopRow(lastItemY + hoopSpacing);
     }
 
-    // 3. Map Hazard Edge Collisions
     if (player.y - player.radius <= 0) {
         gameOver = true;
-        gameOverReason = "Diver swept away out the top ceiling framework!";
+        gameOverReason = "Diver went above the layout screen!";
     }
     if (player.y + player.radius >= canvas.height) {
         gameOver = true;
-        gameOverReason = "Ground impact! Failed to stabilize countdown target in time.";
+        gameOverReason = "Ground impact! Failed to hit 0 in time.";
     }
 
-    // 4. Graphical Rendering Engine Pipeline
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Render Neon Passing Gate Portals
     hoops.forEach(h => {
-        ctx.fillStyle = "#f59e0b"; // Bright amber structural rings
+        ctx.fillStyle = "#f59e0b"; 
         ctx.fillRect(h.x - 6, h.y, 6, hoopHeight);
+        ctx.fillRect(h.x + hoopWidth, h.y, 6, hoopHeight);
+        ctx.fillStyle = "rgba(245, 158, 11, 0.08)"; 
+        ctx.fillRect(h.x, h.y, hoopWidth, hoopHeight);
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 15px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("-" + h.value, h.x + (hoopWidth / 2), h.y - 6);
+    });
+
+    drawSkydiver(ctx, player.x, player.y);
+
+    requestAnimationFrame(update);
+}
+
+resetGame();
+</script>
+</body>
+</html>
