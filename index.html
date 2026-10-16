@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zero Countdown: Skydiver Math Dropper</title>
+    <title>Zero Countdown: Skydiver Multi-Level Math</title>
     <style>
         body {
             margin: 0;
@@ -15,6 +15,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            user-select: none;
         }
         #gameContainer {
             position: relative;
@@ -24,26 +25,92 @@
             border-radius: 8px;
             background: linear-gradient(to bottom, #1e293b, #0f172a);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: block;
         }
         #ui {
             position: absolute;
             top: 20px;
             left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
             font-size: 18px;
             font-weight: bold;
             font-family: monospace;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             pointer-events: none;
         }
-        .score-text {
-            color: #38bdf8;
+        .highlight-blue { color: #38bdf8; }
+        .highlight-green { color: #22c55e; }
+
+        /* Overlay Interface Screen Styles */
+        #menuOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px;
+            text-align: center;
+        }
+        #menuTitle {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+        #menuReason {
+            font-size: 16px;
+            font-family: monospace;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            max-width: 80%;
+        }
+        .action-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .action-btn:hover {
+            background: #1d4ed8;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
 <div id="gameContainer">
-    <div id="ui">MISSIONS_COMPLETED: <span id="scoreVal" class="score-text">0</span></div>
+    <div id="ui">
+        <div>LEVEL: <span id="levelVal" class="highlight-green">1</span></div>
+        <div>SCORE: <span id="scoreVal" class="highlight-blue">0</span></div>
+    </div>
+    
+    <!-- Robust Clickable Overlay for Restart & Level Transitions -->
+    <div id="menuOverlay">
+        <div id="menuTitle">SKY DIVE INITIALIZED</div>
+        <div id="menuReason">Navigate down safely. Subtract countdown values to exactly 0.</div>
+        <button id="actionBtn" class="action-btn">START MISSION</button>
+    </div>
+
     <canvas id="gameCanvas" width="450" height="650"></canvas>
 </div>
 
@@ -51,18 +118,26 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreVal = document.getElementById("scoreVal");
+const levelVal = document.getElementById("levelVal");
 
-// Game State Variables
+const menuOverlay = document.getElementById("menuOverlay");
+const menuTitle = document.getElementById("menuTitle");
+const menuReason = document.getElementById("menuReason");
+const actionBtn = document.getElementById("actionBtn");
+
+// Game State Progression Variables
 let score = 0;
-let gameOver = false;
-let gameOverReason = "";
-let gameSpeed = 2.5;
+let currentLevel = 1;
+let maxLevels = 5;
+let isMenuState = true;
+let menuMode = "start"; // options: "start", "lose", "win", "victory"
+let gameSpeed = 2.2;
 let targetNumber = 0;
 
-// FIXED: Numbers explicitly filled out here so the browser can read it
-const primePool = [2, 3, 5, 7, 11, 13, 17, 19];
+// The Prime Math Pool Data
+const primePool =;
 
-// 4-Way Playable Skydiver Entity Configuration
+// 4-Way Omni Playable Skydiver Configuration
 const player = {
     x: canvas.width / 2,
     y: 150,
@@ -72,24 +147,84 @@ const player = {
     vy: 0
 };
 
-// Keyboard Input Listeners
+// Key Controllers Dictionary
 const keys = {};
-window.addEventListener("keydown", e => keys[e.code] = true);
-window.addEventListener("keyup", e => keys[e.code] = false);
+window.addEventListener("keydown", e => { if(!isMenuState) keys[e.code] = true; });
+window.addEventListener("keyup", e => { keys[e.code] = false; });
 
-// Floating Math Hoops Grid Management
+// Target interactive overlays management
+actionBtn.addEventListener("click", () => {
+    if (menuMode === "start" || menuMode === "lose" || menuMode === "victory") {
+        if (menuMode === "lose" || menuMode === "victory") {
+            score = 0;
+            currentLevel = 1;
+        }
+        startLevel(currentLevel);
+    } else if (menuMode === "win") {
+        currentLevel++;
+        startLevel(currentLevel);
+    }
+});
+
 let hoops = [];
 const hoopHeight = 16;
 const hoopWidth = 85;
-const hoopSpacing = 180; 
+const hoopSpacing = 180;
 
-function generateTargetNumber() {
+// Level Configurator Matrix: dynamically controls speed and step complexities
+function startLevel(level) {
+    isMenuState = false;
+    menuOverlay.classList.add("hidden");
+    
+    // Scale parameters systematically based on difficulty levels
+    gameSpeed = 1.8 + (level * 0.4); 
+    
+    player.x = canvas.width / 2;
+    player.y = 150;
+    player.vx = 0;
+    player.vy = 0;
+    hoops = [];
+    
+    // Level difficulty alters calculation length chain values
+    let chainLength = 2 + Math.floor(level / 2); // Level 1-2 = 2 steps, Level 3-4 = 3 steps, Level 5 = 4 steps
     let sum = 0;
-    let sequenceLength = Math.floor(Math.random() * 3) + 2; 
-    for(let i = 0; i < sequenceLength; i++) {
+    for(let i = 0; i < chainLength; i++) {
         sum += primePool[Math.floor(Math.random() * primePool.length)];
     }
-    return sum;
+    targetNumber = sum;
+
+    scoreVal.innerText = score;
+    levelVal.innerText = currentLevel;
+
+    // Fill the sky path
+    for (let i = 0; i < 4; i++) {
+        spawnHoopRow(canvas.height + 20 + i * hoopSpacing);
+    }
+}
+
+function triggerMenu(mode, reasonText = "") {
+    isMenuState = true;
+    menuMode = mode;
+    menuOverlay.classList.remove("hidden");
+    menuReason.innerText = reasonText;
+    
+    // Reset key map so player doesn't carry kinetic drifts into next load loop
+    for (let key in keys) keys[key] = false;
+
+    if (mode === "lose") {
+        menuTitle.innerText = "CRASH DETECTED";
+        menuTitle.style.color = "#f43f5e";
+        actionBtn.innerText = "RESTART GAME";
+    } else if (mode === "win") {
+        menuTitle.innerText = "LEVEL CLEARED!";
+        menuTitle.style.color = "#22c55e";
+        actionBtn.innerText = `PROCEED TO LEVEL ${currentLevel + 1}`;
+    } else if (mode === "victory") {
+        menuTitle.innerText = "ULTIMATE VICTORY!!!";
+        menuTitle.style.color = "#eab308";
+        menuReason.innerText = `Incredible! You completed all ${maxLevels} high-altitude deployment sectors! Final Score: ${score}`;
+        actionBtn.innerText = "PLAY AGAIN";
+    }
 }
 
 function spawnHoopRow(yPosition) {
@@ -97,7 +232,7 @@ function spawnHoopRow(yPosition) {
     let correctPrime = viableOptions.length > 0 ? viableOptions[Math.floor(Math.random() * viableOptions.length)] : 2;
     
     let decoys = primePool.filter(p => p !== correctPrime);
-    let wrongPrime = decoys[Math.floor(Math.random() * decoys.length)];
+    let wrongPrime = decoys.length > 0 ? decoys[Math.floor(Math.random() * decoys.length)] : 3;
 
     let assignLeft = Math.random() > 0.5;
     let valueLeft = assignLeft ? correctPrime : wrongPrime;
@@ -107,31 +242,11 @@ function spawnHoopRow(yPosition) {
     hoops.push({ x: canvas.width - 40 - hoopWidth, y: yPosition, value: valueRight, passed: false });
 }
 
-function resetGame() {
-    score = 0;
-    gameOver = false;
-    gameOverReason = "";
-    gameSpeed = 2.5;
-    player.x = canvas.width / 2;
-    player.y = 150;
-    player.vx = 0;
-    player.vy = 0;
-    hoops = [];
-    
-    targetNumber = generateTargetNumber();
-    scoreVal.innerText = score;
-
-    for (let i = 0; i < 4; i++) {
-        spawnHoopRow(canvas.height + 20 + i * hoopSpacing);
-    }
-    requestAnimationFrame(update);
-}
-
 function drawSkydiver(ctx, x, y) {
     ctx.save();
     ctx.translate(x, y);
 
-    // 1. Altimeter Equipment Pack (The Backpack containing the number)
+    // 1. Altimeter Equipment Pack Backpack
     ctx.fillStyle = "#cbd5e1";
     ctx.fillRect(-18, -15, 36, 28);
     ctx.strokeStyle = "#475569";
@@ -147,22 +262,22 @@ function drawSkydiver(ctx, x, y) {
     ctx.fillRect(-22, -6, 10, 8);  
     ctx.fillRect(12, -6, 10, 8);   
     
-    // Trailing Lower Stabilizing Legs
+    // Trailing Stabilizing Legs
     ctx.fillStyle = "#0284c7";
     ctx.fillRect(-14, 18, 7, 14);  
     ctx.fillRect(7, 18, 7, 14);   
 
-    // 4. Safety Visor Helmet Structure
+    // 4. Helmet Dome Structure
     ctx.fillStyle = "#ef4444"; 
     ctx.beginPath();
     ctx.arc(0, -20, 11, 0, Math.PI * 2);
     ctx.fill();
 
-    // High altitude protective visor glass screen
+    // Protective visor glass screen
     ctx.fillStyle = "#22d3ee";
     ctx.fillRect(-7, -22, 14, 6);
 
-    // 5. Draw the Countdown Value right on the Diver's Backpack display
+    // 5. Draw the Target Countdown Value on the Backpack Display
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 14px monospace";
     ctx.textAlign = "center";
@@ -172,116 +287,26 @@ function drawSkydiver(ctx, x, y) {
     ctx.restore();
 }
 
-function update() {
-    if (gameOver) {
-        ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = gameOverReason.includes("WIN") ? "#22c55e" : "#f43f5e";
-        ctx.font = "bold 30px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(gameOverReason.includes("WIN") ? "MISSION SUCCESS!" : "CRASHED", canvas.width / 2, canvas.height / 2 - 30);
-        
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "16px monospace";
-        ctx.fillText(gameOverReason, canvas.width / 2, canvas.height / 2 + 15);
-        
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "14px sans-serif";
-        ctx.fillText("Press SPACEBAR to dive again", canvas.width / 2, canvas.height / 2 + 70);
-        
-        if (keys["Space"]) resetGame();
-        else requestAnimationFrame(update);
-        return;
-    }
+function updateLoop() {
+    if (!isMenuState) {
+        // Handle 4-Way Omni Axis Controls
+        if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = -player.speed;
+        else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = player.speed;
+        else player.vx = 0;
 
-    // 4-Way Controls
-    if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = -player.speed;
-    else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = player.speed;
-    else player.vx = 0;
+        if (keys["ArrowUp"] || keys["KeyW"]) player.vy = -player.speed;
+        else if (keys["ArrowDown"] || keys["KeyS"]) player.vy = player.speed;
+        else player.vy = 0;
 
-    if (keys["ArrowUp"] || keys["KeyW"]) player.vy = -player.speed;
-    else if (keys["ArrowDown"] || keys["KeyS"]) player.vy = player.speed;
-    else player.vy = 0;
+        player.x += player.vx;
+        player.y += player.vy;
 
-    player.x += player.vx;
-    player.y += player.vy;
-
-    if (player.vy === 0) {
-        player.y += gameSpeed * 0.35;
-    }
-
-    if (player.x - player.radius < 0) player.x = player.radius;
-    if (player.x + player.radius > canvas.width) player.x = canvas.width - player.radius;
-    if (player.y - player.radius < 0) player.y = player.radius;
-    if (player.y + player.radius > canvas.height) player.y = canvas.height - player.radius;
-
-    for (let i = 0; i < hoops.length; i++) {
-        let h = hoops[i];
-        h.y -= gameSpeed; 
-
-        if (!h.passed && player.y + 12 >= h.y && player.y - 12 <= h.y + hoopHeight) {
-            if (player.x > h.x && player.x < h.x + hoopWidth) {
-                h.passed = true;
-                
-                let sibling = hoops.find(o => o !== h && Math.abs(o.y - h.y) < 5);
-                if (sibling) sibling.passed = true;
-
-                targetNumber -= h.value;
-
-                if (targetNumber === 0) {
-                    score++;
-                    scoreVal.innerText = score;
-                    gameSpeed += 0.3; 
-                    gameOver = true;
-                    gameOverReason = "BACKPACK COUNTDOWN TARGET HIT EXACTLY 0!";
-                    return;
-                } else if (targetNumber < 0) {
-                    gameOver = true;
-                    gameOverReason = `Failed! Dropped past zero to (${targetNumber})!`;
-                    return;
-                }
-            }
+        // Apply constant gravity drift if vertical controls are idle
+        if (player.vy === 0) {
+            player.y += gameSpeed * 0.35;
         }
-    }
 
-    if (hoops.length > 0 && hoops.y < -hoopHeight) {
-        hoops.shift(); 
-        hoops.shift(); 
-        let lastItemY = hoops.length > 0 ? hoops[hoops.length - 1].y : canvas.height;
-        spawnHoopRow(lastItemY + hoopSpacing);
-    }
-
-    if (player.y - player.radius <= 0) {
-        gameOver = true;
-        gameOverReason = "Diver went above the layout screen!";
-    }
-    if (player.y + player.radius >= canvas.height) {
-        gameOver = true;
-        gameOverReason = "Ground impact! Failed to hit 0 in time.";
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    hoops.forEach(h => {
-        ctx.fillStyle = "#f59e0b"; 
-        ctx.fillRect(h.x - 6, h.y, 6, hoopHeight);
-        ctx.fillRect(h.x + hoopWidth, h.y, 6, hoopHeight);
-        ctx.fillStyle = "rgba(245, 158, 11, 0.08)"; 
-        ctx.fillRect(h.x, h.y, hoopWidth, hoopHeight);
-
-        ctx.fillStyle = "#e2e8f0";
-        ctx.font = "bold 15px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("-" + h.value, h.x + (hoopWidth / 2), h.y - 6);
-    });
-
-    drawSkydiver(ctx, player.x, player.y);
-
-    requestAnimationFrame(update);
-}
-
-resetGame();
-</script>
-</body>
-</html>
+        // Keep character bound completely within window canvas walls
+        if (player.x - player.radius < 0) player.x = player.radius;
+        if (player.x + player.radius > canvas.width) player.x = canvas.width - player.radius;
+        if (player.y - player.radius < 0) player.y = player.radius;
