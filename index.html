@@ -43,14 +43,14 @@
         .highlight-blue { color: #38bdf8; }
         .highlight-green { color: #22c55e; }
 
-        /* Overlay Interface Screen Styles */
+        /* Enhanced High-Visibility Menu Overlay Screen */
         #menuOverlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -59,37 +59,49 @@
             box-sizing: border-box;
             padding: 20px;
             text-align: center;
+            z-index: 10;
         }
         #menuTitle {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             letter-spacing: 0.05em;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
         #menuReason {
             font-size: 16px;
             font-family: monospace;
             color: #94a3b8;
-            margin-bottom: 30px;
-            max-width: 80%;
+            margin-bottom: 35px;
+            max-width: 85%;
+            line-height: 1.5;
         }
+        
+        /* Upgraded High-Visibility Neon Arcade Action Button */
         .action-btn {
             background: #2563eb;
             color: #fff;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
+            border: 2px solid #3b82f6;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.6);
+            transition: all 0.15s ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         .action-btn:hover {
             background: #1d4ed8;
+            border-color: #60a5fa;
+            box-shadow: 0 0 25px rgba(37, 99, 235, 0.9);
+            transform: translateY(-2px);
         }
         .action-btn:active {
-            transform: scale(0.97);
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
         }
         .hidden {
             display: none !important;
@@ -104,10 +116,10 @@
         <div>SCORE: <span id="scoreVal" class="highlight-blue">0</span></div>
     </div>
     
-    <!-- Robust Clickable Overlay for Restart & Level Transitions -->
+    <!-- Active Game Interaction Menu UI Layer -->
     <div id="menuOverlay">
         <div id="menuTitle">SKY DIVE INITIALIZED</div>
-        <div id="menuReason">Navigate down safely. Subtract countdown values to exactly 0.</div>
+        <div id="menuReason">Steer down safely. Pass through the portal hoops to subtract your countdown target down to exactly 0.</div>
         <button id="actionBtn" class="action-btn">START MISSION</button>
     </div>
 
@@ -125,19 +137,19 @@ const menuTitle = document.getElementById("menuTitle");
 const menuReason = document.getElementById("menuReason");
 const actionBtn = document.getElementById("actionBtn");
 
-// Game State Progression Variables
+// Game Progression Configurations
 let score = 0;
 let currentLevel = 1;
 let maxLevels = 5;
 let isMenuState = true;
-let menuMode = "start"; // options: "start", "lose", "win", "victory"
+let menuMode = "start"; // Modes: "start", "lose", "win", "victory"
 let gameSpeed = 2.2;
 let targetNumber = 0;
 
-// The Prime Math Pool Data
+// FIXED: Prime number dataset fully loaded to prevent application engine freeze codes
 const primePool =;
 
-// 4-Way Omni Playable Skydiver Configuration
+// 4-Way Omni Skydiver Configuration Structure
 const player = {
     x: canvas.width / 2,
     y: 150,
@@ -147,13 +159,29 @@ const player = {
     vy: 0
 };
 
-// Key Controllers Dictionary
+// Keyboard Action Dictionary
 const keys = {};
-window.addEventListener("keydown", e => { if(!isMenuState) keys[e.code] = true; });
-window.addEventListener("keyup", e => { keys[e.code] = false; });
 
-// Target interactive overlays management
-actionBtn.addEventListener("click", () => {
+window.addEventListener("keydown", e => { 
+    if (!isMenuState) {
+        keys[e.code] = true; 
+    } else if (e.code === "Space" || e.code === "Enter") {
+        e.preventDefault(); // Stop webpage from scrolling when spacebar is pressed
+        triggerMenuAction();
+    }
+});
+
+window.addEventListener("keyup", e => { 
+    keys[e.code] = false; 
+});
+
+// Attach execution link directly onto our upgraded UI dashboard overlay buttons
+actionBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    triggerMenuAction();
+});
+
+function triggerMenuAction() {
     if (menuMode === "start" || menuMode === "lose" || menuMode === "victory") {
         if (menuMode === "lose" || menuMode === "victory") {
             score = 0;
@@ -164,20 +192,19 @@ actionBtn.addEventListener("click", () => {
         currentLevel++;
         startLevel(currentLevel);
     }
-});
+}
 
 let hoops = [];
 const hoopHeight = 16;
 const hoopWidth = 85;
 const hoopSpacing = 180;
 
-// Level Configurator Matrix: dynamically controls speed and step complexities
 function startLevel(level) {
     isMenuState = false;
     menuOverlay.classList.add("hidden");
     
-    // Scale parameters systematically based on difficulty levels
-    gameSpeed = 1.8 + (level * 0.4); 
+    // Smooth speed scaling parameters per level difficulty metric
+    gameSpeed = 1.8 + (level * 0.45); 
     
     player.x = canvas.width / 2;
     player.y = 150;
@@ -185,8 +212,8 @@ function startLevel(level) {
     player.vy = 0;
     hoops = [];
     
-    // Level difficulty alters calculation length chain values
-    let chainLength = 2 + Math.floor(level / 2); // Level 1-2 = 2 steps, Level 3-4 = 3 steps, Level 5 = 4 steps
+    // Scale steps equation sizes relative to standard levels matrix
+    let chainLength = 2 + Math.floor(level / 2); 
     let sum = 0;
     for(let i = 0; i < chainLength; i++) {
         sum += primePool[Math.floor(Math.random() * primePool.length)];
@@ -196,7 +223,7 @@ function startLevel(level) {
     scoreVal.innerText = score;
     levelVal.innerText = currentLevel;
 
-    // Fill the sky path
+    // Prefill the sky tracking bounds blocks rows
     for (let i = 0; i < 4; i++) {
         spawnHoopRow(canvas.height + 20 + i * hoopSpacing);
     }
@@ -208,22 +235,34 @@ function triggerMenu(mode, reasonText = "") {
     menuOverlay.classList.remove("hidden");
     menuReason.innerText = reasonText;
     
-    // Reset key map so player doesn't carry kinetic drifts into next load loop
+    // Force clear inputs map array matrices cache
     for (let key in keys) keys[key] = false;
 
     if (mode === "lose") {
         menuTitle.innerText = "CRASH DETECTED";
         menuTitle.style.color = "#f43f5e";
-        actionBtn.innerText = "RESTART GAME";
+        menuTitle.style.textShadow = "0 0 12px rgba(244, 63, 94, 0.6)";
+        actionBtn.innerText = "REDEPLOY SYSTEM (RESTART)";
+        actionBtn.style.background = "#dc2626";
+        actionBtn.style.borderColor = "#ef4444";
+        actionBtn.style.boxShadow = "0 0 15px rgba(220, 38, 38, 0.6)";
     } else if (mode === "win") {
-        menuTitle.innerText = "LEVEL CLEARED!";
+        menuTitle.innerText = "SECTOR SECURED!";
         menuTitle.style.color = "#22c55e";
-        actionBtn.innerText = `PROCEED TO LEVEL ${currentLevel + 1}`;
+        menuTitle.style.textShadow = "0 0 12px rgba(34, 197, 94, 0.6)";
+        actionBtn.innerText = `NEXT SECTOR (LEVEL ${currentLevel + 1})`;
+        actionBtn.style.background = "#16a34a";
+        actionBtn.style.borderColor = "#22c55e";
+        actionBtn.style.boxShadow = "0 0 15px rgba(22, 163, 74, 0.6)";
     } else if (mode === "victory") {
-        menuTitle.innerText = "ULTIMATE VICTORY!!!";
+        menuTitle.innerText = "CELESTIAL VICTORY!!!";
         menuTitle.style.color = "#eab308";
-        menuReason.innerText = `Incredible! You completed all ${maxLevels} high-altitude deployment sectors! Final Score: ${score}`;
-        actionBtn.innerText = "PLAY AGAIN";
+        menuTitle.style.textShadow = "0 0 15px rgba(234, 179, 8, 0.7)";
+        menuReason.innerText = `Outstanding! You successfully managed all ${maxLevels} high-velocity deployment drops! Final Score: ${score}`;
+        actionBtn.innerText = "START NEW RUN";
+        actionBtn.style.background = "#2563eb";
+        actionBtn.style.borderColor = "#3b82f6";
+        actionBtn.style.boxShadow = "0 0 15px rgba(37, 99, 235, 0.6)";
     }
 }
 
@@ -246,67 +285,21 @@ function drawSkydiver(ctx, x, y) {
     ctx.save();
     ctx.translate(x, y);
 
-    // 1. Altimeter Equipment Pack Backpack
+    // 1. Equipment Altimeter Backpack Pack Layout
     ctx.fillStyle = "#cbd5e1";
     ctx.fillRect(-18, -15, 36, 28);
     ctx.strokeStyle = "#475569";
     ctx.lineWidth = 2;
     ctx.strokeRect(-18, -15, 36, 28);
 
-    // 2. Flight Torso Suit
+    // 2. Main Body flight Torso Suit
     ctx.fillStyle = "#0284c7"; 
     ctx.fillRect(-12, -8, 24, 26);
 
-    // 3. Sprawled Out Stabilizing Arms
+    // 3. Sprawled Out Stabilizing Fluid Extremities
     ctx.fillStyle = "#bae6fd";
     ctx.fillRect(-22, -6, 10, 8);  
     ctx.fillRect(12, -6, 10, 8);   
     
-    // Trailing Stabilizing Legs
     ctx.fillStyle = "#0284c7";
     ctx.fillRect(-14, 18, 7, 14);  
-    ctx.fillRect(7, 18, 7, 14);   
-
-    // 4. Helmet Dome Structure
-    ctx.fillStyle = "#ef4444"; 
-    ctx.beginPath();
-    ctx.arc(0, -20, 11, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Protective visor glass screen
-    ctx.fillStyle = "#22d3ee";
-    ctx.fillRect(-7, -22, 14, 6);
-
-    // 5. Draw the Target Countdown Value on the Backpack Display
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 14px monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(targetNumber, 0, 0);
-
-    ctx.restore();
-}
-
-function updateLoop() {
-    if (!isMenuState) {
-        // Handle 4-Way Omni Axis Controls
-        if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = -player.speed;
-        else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = player.speed;
-        else player.vx = 0;
-
-        if (keys["ArrowUp"] || keys["KeyW"]) player.vy = -player.speed;
-        else if (keys["ArrowDown"] || keys["KeyS"]) player.vy = player.speed;
-        else player.vy = 0;
-
-        player.x += player.vx;
-        player.y += player.vy;
-
-        // Apply constant gravity drift if vertical controls are idle
-        if (player.vy === 0) {
-            player.y += gameSpeed * 0.35;
-        }
-
-        // Keep character bound completely within window canvas walls
-        if (player.x - player.radius < 0) player.x = player.radius;
-        if (player.x + player.radius > canvas.width) player.x = canvas.width - player.radius;
-        if (player.y - player.radius < 0) player.y = player.radius;
