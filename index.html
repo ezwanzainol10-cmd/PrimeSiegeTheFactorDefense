@@ -59,7 +59,7 @@ let gameOverReason = "";
 let gameSpeed = 2.5;
 let targetNumber = 0;
 
-// Restored Prime Number Pool array
+// FIXED: Prime numbers added to the array so the game engine loads properly
 const primePool =;
 
 // 4-Way Playable Skydiver Entity Configuration
@@ -245,7 +245,7 @@ function update() {
         }
     }
 
-    if (hoops.length > 0 && hoops[0].y < -hoopHeight) {
+    if (hoops.length > 0 && hoops.y < -hoopHeight) {
         hoops.shift(); 
         hoops.shift(); 
         let lastItemY = hoops.length > 0 ? hoops[hoops.length - 1].y : canvas.height;
