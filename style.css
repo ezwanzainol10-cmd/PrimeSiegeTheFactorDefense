@@ -33,7 +33,7 @@ body {
     flex-direction: column;
 }
 
-/* UI Screens */
+/* UI Screens - Memastikan z-index tinggi semasa aktif */
 .screen {
     position: absolute; 
     top: 0; 
@@ -45,15 +45,19 @@ body {
     align-items: center; 
     justify-content: center;
     padding: 20px; 
-    z-index: 10; 
+    z-index: 100; 
     background: rgba(10, 11, 16, 0.95);
-    transition: opacity 0.3s ease;
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.2s ease;
 }
 
+/* [DIBAIKI] Menyembunyikan skrin sepenuhnya tanpa halangan klik */
 .hidden { 
-    opacity: 0; 
-    pointer-events: none; 
+    opacity: 0 !important; 
+    pointer-events: none !important; 
     display: none !important; 
+    z-index: -100 !important;
 }
 
 h1 { 
