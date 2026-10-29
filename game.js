@@ -15,11 +15,11 @@ let particles = [];
 let flashColor = null;
 let flashTicks = 0;
 
-// [TELAH DIBAIKI] Senarai nombor lengkap mengikut tahap kesukaran KSSM
+// Data Nombor Bulat Silabus DSKP Bab 2
 const numberPool = {
-    mudah:,
-    sederhana:,
-    susah: [96, 98, 100, 105, 108, 110, 120, 126, 132, 135, 140, 144, 150, 160, 162, 168, 175, 180]
+    mudah: [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30],
+    sederhana: [32, 35, 36, 40, 42, 44, 45, 48, 50, 52, 54, 56, 60, 63, 64, 70, 72, 75, 80, 84, 90],
+    susah: [96, 100, 105, 108, 112, 120, 126, 132, 135, 140, 144, 150, 160, 162, 168, 175, 180]
 };
 
 // Pengurusan Responsif Skrin Canvas
@@ -31,17 +31,20 @@ function resizeCanvas() {
     }
 }
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+// Panggilan pertama sejurus fail dimuatkan
+setTimeout(resizeCanvas, 100);
 
-// Navigasi Skrin UI
+// [DIBAIKI] Navigasi Fungsi Skrin Dengan Penyahaktifan Kelas CSS Yang Betul
 function showDifficulty() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById('menu-screen').classList.add('hidden');
     document.getElementById('difficulty-screen').classList.remove('hidden');
+    document.getElementById('gameover-screen').classList.add('hidden');
 }
 
 function backToMenu() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
     document.getElementById('menu-screen').classList.remove('hidden');
+    document.getElementById('difficulty-screen').classList.add('hidden');
+    document.getElementById('gameover-screen').classList.add('hidden');
 }
 
 // Memulakan Permainan Berdasarkan Tahap Pilihan
@@ -50,7 +53,11 @@ function startGame(selectedDiff) {
     score = 0;
     lasers = [];
     particles = [];
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    
+    // Sembunyikan semua skrin menu supaya tidak mengganggu sentuhan skrin
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('difficulty-screen').classList.add('hidden');
+    document.getElementById('gameover-screen').classList.add('hidden');
     
     document.getElementById('score-display').innerText = `SKOR: ${score}`;
     timeRemaining = difficulty === 'mudah' ? 45 : difficulty === 'sederhana' ? 40 : 30;
@@ -110,7 +117,6 @@ function fireLaser(primeValue) {
         val: primeValue
     });
 
-    // Validasi Pembahagian Tepat (DSKP Faktor Perdana)
     if (currentHP % primeValue === 0) {
         currentHP = currentHP / primeValue;
         primeFactorsChain.push(primeValue);
@@ -129,7 +135,6 @@ function fireLaser(primeValue) {
             }
         }, 150);
     } else {
-        // Penalti Jika Salah Faktor
         triggerFlash('#cc2424');
         timeRemaining = Math.max(0, timeRemaining - 4);
         document.getElementById('timer').innerText = `MASA: ${timeRemaining}s`;
@@ -164,7 +169,7 @@ function updateChainUI() {
         const sym = document.createElement('span');
         sym.className = 'chain-symbol';
         sym.innerText = '×';
-                container.appendChild(sym);
+        container.appendChild(sym);
 
         const rem = document.createElement('div');
         rem.className = 'chain-node';
@@ -192,7 +197,6 @@ function triggerFlash(color) {
     flashTicks = 8;
 }
 
-// Loop Animasi Canvas
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -204,13 +208,13 @@ function updateGame() {
         flashTicks--;
     }
 
-    // Lukis Tapak Benteng
+    // Benteng
     ctx.fillStyle = '#1c1e2e';
     ctx.fillRect(0, canvas.height - 25, canvas.width, 25);
     ctx.fillStyle = '#ff3e3e';
     ctx.fillRect(0, canvas.height - 28, canvas.width, 3);
 
-    // Lukis Meriam Mantap
+    // Meriam
     const turretX = canvas.width / 2;
     const turretY = canvas.height - 25;
     
@@ -231,7 +235,7 @@ function updateGame() {
     ctx.lineWidth = 6;
     ctx.beginPath(); ctx.moveTo(turretX, turretY); ctx.lineTo(turretX, turretY - 43); ctx.stroke();
 
-    // Pergerakan Raksasa Ganas
+    // Raksasa
     if (currentMonster) {
         currentMonster.y += currentMonster.speed;
         currentMonster.pulse += 0.07;
@@ -243,7 +247,6 @@ function updateGame() {
         ctx.arc(currentMonster.x, currentMonster.y, pulseRadius, 0, Math.PI * 2);
         ctx.fill();
         
-        // Tanduk Raksasa
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.moveTo(currentMonster.x - 25, currentMonster.y - 20);
@@ -257,7 +260,6 @@ function updateGame() {
         ctx.lineTo(currentMonster.x + 10, currentMonster.y - 30);
         ctx.fill();
 
-        // Mata Raksasa
         ctx.fillStyle = '#000000';
         ctx.beginPath(); ctx.arc(currentMonster.x - 15, currentMonster.y - 5, 8, 0, Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.arc(currentMonster.x + 15, currentMonster.y - 5, 8, 0, Math.PI*2); ctx.fill();
@@ -265,7 +267,6 @@ function updateGame() {
         ctx.beginPath(); ctx.arc(currentMonster.x - 15, currentMonster.y - 5, 3, 0, Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.arc(currentMonster.x + 15, currentMonster.y - 5, 3, 0, Math.PI*2); ctx.fill();
 
-        // HP Raksasa (Angka Matematik)
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'center';
@@ -277,7 +278,7 @@ function updateGame() {
         }
     }
 
-    // Animasi Laser
+    // Laser
     for (let i = lasers.length - 1; i >= 0; i--) {
         let l = lasers[i];
         let dx = l.targetX - l.x;
@@ -299,10 +300,3 @@ function updateGame() {
         }
     }
 
-    // Animasi Partikel Letupan
-    for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.02;
-        if (p.alpha <= 0) {
