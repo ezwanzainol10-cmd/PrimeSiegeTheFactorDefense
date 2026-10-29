@@ -15,14 +15,14 @@ let particles = [];
 let flashColor = null;
 let flashTicks = 0;
 
-// [TELAH DIBAIKI] Data Nombor Bulat Mengikut Silabus DSKP Bab 2
+// [TELAH DIBAIKI] Senarai nombor lengkap mengikut tahap kesukaran KSSM
 const numberPool = {
-    mudah: [4, 6, 8, 9, 10, 12, 14, 15, 18, 20, 21, 25, 27],
-    sederhana: [24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 60, 63],
-    susah: [56, 72, 84, 90, 98, 100, 105, 120, 126, 144, 150, 168, 180]
+    mudah:,
+    sederhana:,
+    susah: [96, 98, 100, 105, 108, 110, 120, 126, 132, 135, 140, 144, 150, 160, 162, 168, 175, 180]
 };
 
-// Pengurusan Responsif Skrin
+// Pengurusan Responsif Skrin Canvas
 function resizeCanvas() {
     const container = document.getElementById('canvas-container');
     if (container) {
@@ -56,7 +56,7 @@ function startGame(selectedDiff) {
     timeRemaining = difficulty === 'mudah' ? 45 : difficulty === 'sederhana' ? 40 : 30;
     document.getElementById('timer').innerText = `MASA: ${timeRemaining}s`;
 
-    resizeCanvas(); // Pastikan saiz canvas tepat sejurus sebelum raksasa keluar
+    resizeCanvas(); 
     spawnMonster();
 
     clearInterval(gameInterval);
@@ -124,7 +124,7 @@ function fireLaser(primeValue) {
                 score += (difficulty === 'mudah' ? 10 : difficulty === 'sederhana' ? 20 : 35);
                 document.getElementById('score-display').innerText = `SKOR: ${score}`;
                 createExplosion(currentMonster.x, currentMonster.y, '#ffea00', 30);
-                timeRemaining += 5; // Bonus masa ganjaran
+                timeRemaining += 5; 
                 spawnMonster();
             }
         }, 150);
@@ -164,7 +164,7 @@ function updateChainUI() {
         const sym = document.createElement('span');
         sym.className = 'chain-symbol';
         sym.innerText = '×';
-        container.appendChild(sym);
+                container.appendChild(sym);
 
         const rem = document.createElement('div');
         rem.className = 'chain-node';
@@ -304,3 +304,5 @@ function updateGame() {
         let p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
+        p.alpha -= 0.02;
+        if (p.alpha <= 0) {
