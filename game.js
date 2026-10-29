@@ -15,18 +15,20 @@ let particles = [];
 let flashColor = null;
 let flashTicks = 0;
 
-// Data Kolam Nombor Mengikut Tahap Kesukaran DSKP
+// [TELAH DIBAIKI] Data Nombor Bulat Mengikut Silabus DSKP Bab 2
 const numberPool = {
-    mudah:,
-    sederhana:,
-    susah: [100, 105, 108, 120, 126, 135, 140, 144, 150, 162, 168, 175, 180]
+    mudah: [4, 6, 8, 9, 10, 12, 14, 15, 18, 20, 21, 25, 27],
+    sederhana: [24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 60, 63],
+    susah: [56, 72, 84, 90, 98, 100, 105, 120, 126, 144, 150, 168, 180]
 };
 
 // Pengurusan Responsif Skrin
 function resizeCanvas() {
     const container = document.getElementById('canvas-container');
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
+    if (container) {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+    }
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
@@ -54,6 +56,7 @@ function startGame(selectedDiff) {
     timeRemaining = difficulty === 'mudah' ? 45 : difficulty === 'sederhana' ? 40 : 30;
     document.getElementById('timer').innerText = `MASA: ${timeRemaining}s`;
 
+    resizeCanvas(); // Pastikan saiz canvas tepat sejurus sebelum raksasa keluar
     spawnMonster();
 
     clearInterval(gameInterval);
@@ -301,9 +304,3 @@ function updateGame() {
         let p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha -= 0.02;
-        if (p.alpha <= 0) {
-            particles.splice(i, 1);
-        } else {
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.alpha;
