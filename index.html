@@ -5,216 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prime Siege: The Factor Defense</title>
     <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            user-select: none; 
-            -webkit-user-select: none;
-        }
-
-        body { 
-            background: #0d0e15; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            color: #fff; 
-            overflow: hidden;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            height: 100vh; 
-            width: 100vw;
-        }
-
-        #game-container {
-            position: relative; 
-            width: 100%; 
-            max-width: 450px; 
-            height: 100%; 
-            max-height: 850px;
-            background: radial-gradient(circle, #1a1c29 0%, #0a0b10 100%);
-            border: 4px solid #3a3f58; 
-            border-radius: 16px; 
-            overflow: hidden;
-            display: flex; 
-            flex-direction: column;
-        }
-
-        /* UI Screens - Z-index tinggi untuk lapisan menu */
-        .screen {
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            padding: 20px; 
-            z-index: 100; 
-            background: rgba(10, 11, 16, 0.96);
-            opacity: 1;
-            pointer-events: auto;
-            transition: opacity 0.2s ease;
-        }
-
-        /* Menyembunyikan skrin menu sepenuhnya */
-        .hidden { 
-            opacity: 0 !important; 
-            pointer-events: none !important; 
-            display: none !important; 
-            z-index: -100 !important;
-        }
-
-        h1 { 
-            font-size: 2.2rem; 
-            color: #ff3e3e; 
-            text-shadow: 0 0 12px rgba(255,62,62,0.6); 
-            text-align: center; 
-            margin-bottom: 10px; 
-            letter-spacing: 2px;
-        }
-
-        p { 
-            text-align: center; 
-            color: #a0a5c0; 
-            font-size: 0.95rem; 
-            margin-bottom: 25px; 
-            line-height: 1.4;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            font-size: 1.1rem; 
-            font-weight: bold;
-            border-radius: 30px; 
-            cursor: pointer; 
-            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
-            width: 85%; 
-            margin: 10px 0; 
-            transform: scale(1); 
-            transition: transform 0.1s;
-        }
-
-        .btn:active { 
-            transform: scale(0.96); 
-        }
-
-        .btn-diff { 
-            background: linear-gradient(135deg, #4776e6, #8e54e9); 
-            box-shadow: 0 5px 15px rgba(142, 84, 233, 0.4); 
-        }
-
-        /* HUD Permainan */
-        #hud {
-            display: flex; 
-            justify-content: space-between; 
-            width: 100%; 
-            padding: 15px;
-            background: rgba(25, 27, 41, 0.85); 
-            border-bottom: 2px solid #2a2d42; 
-            z-index: 5;
-        }
-
-        .hud-item { 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            color: #00ffcc; 
-        }
-
-        #timer { 
-            color: #ff3e3e; 
-        }
-
-        /* Medan Canvas */
-        #canvas-container { 
-            flex: 1; 
-            position: relative; 
-            width: 100%; 
-        }
-
-        canvas { 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
-        }
-
-        /* Panel Kawalan Meriam */
-        #control-panel {
-            background: #151722; 
-            border-top: 3px solid #2a2d42; 
-            padding: 15px;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 12px; 
-            z-index: 5;
-        }
-
-        .section-title { 
-            font-size: 0.85rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: #8e54e9; 
-            font-weight: bold;
-        }
-
-        #ammo-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-            width: 100%; 
-        }
-
-        .ammo-btn {
-            background: #222533; 
-            border: 2px solid #3d4363; 
-            border-radius: 12px;
-            color: #fff; 
-            font-size: 1.6rem; 
-            font-weight: bold; 
-            padding: 12px 0;
-            cursor: pointer; 
-            transition: all 0.1s; 
-            box-shadow: inset 0 -4px 0 #13151f;
-        }
-
-        .ammo-btn:active { 
-            transform: translateY(2px); 
-            box-shadow: inset 0 -1px 0 #13151f; 
-        }
-
-        #chain-container {
-            width: 100%; 
-            background: #0a0b10; 
-            border: 1px dashed #3d4363;
-            border-radius: 8px; 
-            padding: 8px; 
-            min-height: 46px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-            flex-wrap: wrap;
-        }
-
-        .chain-node { 
-            background: #8e54e9; 
-            padding: 4px 12px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            font-size: 1rem; 
-        }
-
-        .chain-symbol { 
-            color: #ff4b2b; 
-            font-weight: bold; 
-            font-size: 1.1rem;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+        body { background: #0d0e15; font-family: 'Segoe UI', sans-serif; color: #fff; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100vw; }
+        #game-container { position: relative; width: 100%; max-width: 450px; height: 100%; max-height: 850px; background: radial-gradient(circle, #1a1c29 0%, #0a0b10 100%); border: 4px solid #3a3f58; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 100; background: rgba(10, 11, 16, 0.96); opacity: 1; pointer-events: auto; }
+        .hidden { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; z-index: -100 !important; }
+        h1 { font-size: 2.2rem; color: #ff3e3e; text-shadow: 0 0 12px rgba(255,62,62,0.6); text-align: center; margin-bottom: 10px; letter-spacing: 2px; }
+        p { text-align: center; color: #a0a5c0; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
+        .btn { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4); width: 85%; margin: 10px 0; }
+        .btn-diff { background: linear-gradient(135deg, #4776e6, #8e54e9); box-shadow: 0 5px 15px rgba(142, 84, 233, 0.4); }
+        #hud { display: flex; justify-content: space-between; width: 100%; padding: 15px; background: rgba(25, 27, 41, 0.85); border-bottom: 2px solid #2a2d42; z-index: 5; }
+        .hud-item { font-size: 1.1rem; font-weight: bold; color: #00ffcc; }
+        #timer { color: #ff3e3e; }
+        #canvas-container { flex: 1; position: relative; width: 100%; }
+        canvas { width: 100%; height: 100%; display: block; }
+        #control-panel { background: #151722; border-top: 3px solid #2a2d42; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 5; }
+        .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #8e54e9; font-weight: bold; }
+        #ammo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; }
+        .ammo-btn { background: #222533; border: 2px solid #3d4363; border-radius: 12px; color: #fff; font-size: 1.6rem; font-weight: bold; padding: 12px 0; cursor: pointer; box-shadow: inset 0 -4px 0 #13151f; }
+        .ammo-btn:active { transform: translateY(2px); box-shadow: inset 0 -1px 0 #13151f; }
+        #chain-container { width: 100%; background: #0a0b10; border: 1px dashed #3d4363; border-radius: 8px; padding: 8px; min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .chain-node { background: #8e54e9; padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 1rem; }
+        .chain-symbol { color: #ff4b2b; font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -236,7 +48,7 @@
             <button class="btn" style="background: #ff3e3e;" onclick="startGame('susah')">SUSAH (Ganas & Agresif)</button>
         </div>
 
-        <!-- SKRIN TAMAT (MENANG/KALAH) -->
+        <!-- SKRIN TAMAT -->
         <div id="gameover-screen" class="screen hidden">
             <h1 id="go-title">KUBU BOLOS!</h1>
             <p id="go-desc">Raksasa berjaya merobohkan benteng faktor anda.</p>
@@ -245,7 +57,7 @@
                 <div id="correct-ans-chain" style="margin-top:8px;"></div>
             </div>
             <button class="btn btn-diff" onclick="showDifficulty()">CUBA LAGI</button>
-            <button class="btn" style="background:#222533; box-shadow: none;" onclick="backToMenu()">MENU UTAMA</button>
+            <button class="btn" style="background:#222533;" onclick="backToMenu()">MENU UTAMA</button>
         </div>
 
         <!-- HUD PERMAINAN -->
@@ -254,7 +66,7 @@
             <div class="hud-item" id="timer">MASA: 45s</div>
         </div>
 
-        <!-- MEDAN PERMAINAN (CANVAS) -->
+        <!-- MEDAN PERMAINAN -->
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -278,7 +90,6 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // State Permainan
         let difficulty = 'mudah';
         let score = 0;
         let timeRemaining = 45;
@@ -292,14 +103,12 @@
         let flashColor = null;
         let flashTicks = 0;
 
-        // [DIBAIKI SEPENUHNYA] Nombor dimasukkan dengan betul dalam kurungan array
         const numberPool = {
-            mudah:,
-            sederhana:,
-            susah: [72, 84, 90, 100, 120, 140, 150, 180]
+            mudah: [12, 18, 20, 24, 28, 30],
+            sederhana: [36, 42, 45, 50, 60, 72, 84, 90],
+            susah: [100, 108, 120, 126, 144, 150, 180]
         };
 
-        // Mengawal saiz canvas
         function resizeCanvas() {
             const container = document.getElementById('canvas-container');
             if (container) {
@@ -310,7 +119,270 @@
         window.addEventListener('resize', resizeCanvas);
         setTimeout(resizeCanvas, 150);
 
-        // Kawalan UI Skrin
         function showDifficulty() {
             document.getElementById('menu-screen').classList.add('hidden');
             document.getElementById('difficulty-screen').classList.remove('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+        }
+
+        function backToMenu() {
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('difficulty-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+        }
+
+        function startGame(selectedDiff) {
+            difficulty = selectedDiff;
+            score = 0;
+            lasers = [];
+            particles = [];
+            
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('difficulty-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            
+            document.getElementById('score-display').innerText = `SKOR: ${score}`;
+            timeRemaining = difficulty === 'mudah' ? 45 : difficulty === 'sederhana' ? 40 : 30;
+            document.getElementById('timer').innerText = `MASA: ${timeRemaining}s`;
+
+            resizeCanvas(); 
+            spawnMonster();
+
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            gameInterval = setInterval(updateGame, 1000 / 60); 
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            timeRemaining--;
+            document.getElementById('timer').innerText = `MASA: ${timeRemaining}s`;
+            if (timeRemaining <= 0) {
+                endGame(false, "MASA TAMAT!", "Raksasa melepasi benteng kerana masa tamat!");
+            }
+        }
+
+        function spawnMonster() {
+            const pool = numberPool[difficulty];
+            targetNumber = pool[Math.floor(Math.random() * pool.length)];
+            currentHP = targetNumber;
+            primeFactorsChain = [];
+            updateChainUI();
+
+            let speed = 0.35;
+            let color = '#ff3e3e'; 
+            if (difficulty === 'sederhana') { speed = 0.55; color = '#d4af37'; }
+            if (difficulty === 'susah') { speed = 0.85; color = '#a100ff'; }
+
+            currentMonster = {
+                x: canvas.width / 2,
+                y: -60,
+                radius: 45,
+                maxHP: targetNumber,
+                speed: speed,
+                color: color,
+                pulse: 0
+            };
+        }
+
+        function fireLaser(primeValue) {
+            if (!currentMonster) return;
+
+            lasers.push({
+                x: canvas.width / 2,
+                y: canvas.height - 40,
+targetX: currentMonster.x,
+targetY: currentMonster.y,
+speed: 16,
+val: primeValue
+});
+if (currentHP % primeValue === 0) {
+currentHP = currentHP / primeValue;
+primeFactorsChain.push(primeValue);
+triggerFlash('#00cc7a');
+createExplosion(currentMonster.x, currentMonster.y, '#00ff99', 14);
+setTimeout(() => {
+updateChainUI();
+if (currentHP === 1) {
+score += (difficulty === 'mudah' ? 10 : difficulty === 'sederhana' ? 20 : 35);
+document.getElementById('score-display').innerText = SKOR: ${score};
+createExplosion(currentMonster.x, currentMonster.y, '#ffea00', 35);
+timeRemaining += 6;
+spawnMonster();
+}
+}, 150);
+} else {
+triggerFlash('#cc2424');
+timeRemaining = Math.max(0, timeRemaining - 5);
+document.getElementById('timer').innerText = MASA: ${timeRemaining}s;
+createExplosion(canvas.width / 2, canvas.height - 40, '#ff3e3e', 8);
+}
+}
+function updateChainUI() {
+const container = document.getElementById('chain-container');
+container.innerHTML = '';
+if (primeFactorsChain.length === 0) {
+container.innerHTML = <span style="color:#5f6480; font-size:0.85rem;">Sedia menerima kombinasi peluru...</span>;
+return;
+}
+primeFactorsChain.forEach((num, index) => {
+const node = document.createElement('div');
+node.className = 'chain-node';
+node.innerText = num;
+container.appendChild(node);
+if (index < primeFactorsChain.length - 1) {
+const sym = document.createElement('span');
+sym.className = 'chain-symbol';
+sym.innerText = '×';
+container.appendChild(sym);
+}
+});
+if (currentHP > 1) {
+const sym = document.createElement('span');
+sym.className = 'chain-symbol';
+sym.innerText = '×';
+container.appendChild(sym);
+const rem = document.createElement('div');
+rem.className = 'chain-node';
+rem.style.background = '#444';
+rem.innerText = currentHP;
+container.appendChild(rem);
+}
+}
+function createExplosion(x, y, color, count = 12) {
+for (let i = 0; i < count; i++) {
+particles.push({
+x: x, y: y,
+vx: (Math.random() - 0.5) * 7,
+vy: (Math.random() - 0.5) * 7,
+radius: Math.random() * 4 + 2,
+color: color,
+alpha: 1
+});
+}
+}
+function triggerFlash(color) {
+flashColor = color;
+flashTicks = 8;
+}
+function updateGame() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+if (flashTicks > 0) {
+ctx.fillStyle = flashColor;
+ctx.globalAlpha = flashTicks * 0.05;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.globalAlpha = 1.0;
+flashTicks--;
+}
+ctx.fillStyle = '#1c1e2e';
+ctx.fillRect(0, canvas.height - 25, canvas.width, 25);
+ctx.fillStyle = '#ff3e3e';
+ctx.fillRect(0, canvas.height - 28, canvas.width, 3);
+const turretX = canvas.width / 2;
+const turretY = canvas.height - 25;
+ctx.fillStyle = '#3a3f58';
+ctx.beginPath();
+ctx.arc(turretX, turretY, 35, Math.PI, 0);
+ctx.fill();
+ctx.fillStyle = '#00ffcc';
+ctx.beginPath();
+ctx.arc(turretX, turretY, 12, Math.PI, 0);
+ctx.fill();
+ctx.strokeStyle = '#2a2d42';
+ctx.lineWidth = 14;
+ctx.beginPath(); ctx.moveTo(turretX, turretY); ctx.lineTo(turretX, turretY - 45); ctx.stroke();
+ctx.strokeStyle = '#00ffcc';
+ctx.lineWidth = 6;
+ctx.beginPath(); ctx.moveTo(turretX, turretY); ctx.lineTo(turretX, turretY - 43); ctx.stroke();
+if (currentMonster) {
+currentMonster.y += currentMonster.speed;
+currentMonster.pulse += 0.07;
+const pulseRadius = currentMonster.radius + Math.sin(currentMonster.pulse) * 3;
+ctx.fillStyle = currentMonster.color;
+ctx.beginPath();
+ctx.arc(currentMonster.x, currentMonster.y, pulseRadius, 0, Math.PI * 2);
+ctx.fill();
+ctx.fillStyle = '#ffffff';
+ctx.beginPath();
+ctx.moveTo(currentMonster.x - 25, currentMonster.y - 20);
+ctx.lineTo(currentMonster.x - 45, currentMonster.y - 50);
+ctx.lineTo(currentMonster.x - 10, currentMonster.y - 30);
+ctx.fill();
+ctx.beginPath();
+ctx.moveTo(currentMonster.x + 25, currentMonster.y - 20);
+ctx.lineTo(currentMonster.x + 45, currentMonster.y - 50);
+ctx.lineTo(currentMonster.x + 10, currentMonster.y - 30);
+ctx.fill();
+ctx.fillStyle = '#000000';
+ctx.beginPath(); ctx.arc(currentMonster.x - 15, currentMonster.y - 5, 8, 0, Math.PI2); ctx.fill();
+ctx.beginPath(); ctx.arc(currentMonster.x + 15, currentMonster.y - 5, 8, 0, Math.PI2); ctx.fill();
+ctx.fillStyle = '#ff0000';
+ctx.beginPath(); ctx.arc(currentMonster.x - 15, currentMonster.y - 5, 4, 0, Math.PI2); ctx.fill();
+ctx.beginPath(); ctx.arc(currentMonster.x + 15, currentMonster.y - 5, 4, 0, Math.PI2); ctx.fill();
+ctx.fillStyle = '#ffffff';
+ctx.font = 'bold 24px Arial';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText(currentHP, currentMonster.x, currentMonster.y + 15);
+if (currentMonster.y + currentMonster.radius >= canvas.height - 25) {
+endGame(false, "BENTENG MELETUP!", Raksasa angka ${targetNumber} menembusi kubu pertahanan.);
+}
+}
+for (let i = lasers.length - 1; i >= 0; i--) {
+let l = lasers[i];
+let dx = l.targetX - l.x;
+let dy = l.targetY - l.y;
+let dist = Math.sqrt(dxdx + dydy);
+if (dist < l.speed) {
+lasers.splice(i, 1);
+} else {
+l.x += (dx / dist) * l.speed;
+l.y += (dy / dist) * l.speed;
+ctx.strokeStyle = '#00ffcc';
+ctx.lineWidth = 4;
+ctx.beginPath();
+ctx.moveTo(l.x, l.y);
+ctx.lineTo(l.x - (dx/dist)*22, l.y - (dy/dist)*22);
+ctx.stroke();
+}
+}
+for (let i = particles.length - 1; i >= 0; i--) {
+let p = particles[i];
+p.x += p.vx;
+p.y += p.vy;
+p.alpha -= 0.02;
+if (p.alpha <= 0) {
+particles.splice(i, 1);
+} else {
+ctx.fillStyle = p.color;
+ctx.globalAlpha = p.alpha;
+ctx.beginPath();
+ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+ctx.fill();
+ctx.globalAlpha = 1.0;
+}
+}
+}
+function endGame(isWin, title, message) {
+clearInterval(gameInterval);
+clearInterval(timerInterval);
+document.getElementById('go-title').innerText = title;
+document.getElementById('go-desc').innerHTML = ${message}<br><br><span style='color:#00ffcc; font-size:1.25rem;'>Skor Akhir: ${score}</span>;
+const ansContainer = document.getElementById('correct-ans-chain');
+ansContainer.innerHTML = '';
+let temp = targetNumber;
+let factors = [];
+let d = 2;
+while (temp > 1) {
+while (temp % d === 0) {
+factors.push(d);
+temp /= d;
+}
+d++;
+}
+factors.forEach((f, idx) => {
+ansContainer.innerHTML += <span class="chain-node" style="background:#00cc7a; display:inline-block; margin:2px;">${f}</span>;
+if(idx < factors.length - 1) ansContainer.innerHTML += <span class="chain-symbol">×</span>;
+});
+document.getElementById('gameover-screen').classList.remove('hidden');
+}
