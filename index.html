@@ -1,0 +1,310 @@
+html
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prime Siege: The Factor Defense</title>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        body { 
+            background: #0d0e15; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #fff; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            height: 100vh; 
+            width: 100vw;
+        }
+
+        #game-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 450px; 
+            height: 100%; 
+            max-height: 850px;
+            background: radial-gradient(circle, #1a1c29 0%, #0a0b10 100%);
+            border: 4px solid #3a3f58; 
+            border-radius: 16px; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* UI Screens - Z-index tinggi untuk mengawal klik lapisan aktif */
+        .screen {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            padding: 20px; 
+            z-index: 100; 
+            background: rgba(10, 11, 16, 0.96);
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Menyembunyikan skrin sepenuhnya untuk mengelakkan blocking click */
+        .hidden { 
+            opacity: 0 !important; 
+            pointer-events: none !important; 
+            display: none !important; 
+            z-index: -100 !important;
+        }
+
+        h1 { 
+            font-size: 2.2rem; 
+            color: #ff3e3e; 
+            text-shadow: 0 0 12px rgba(255,62,62,0.6); 
+            text-align: center; 
+            margin-bottom: 10px; 
+            letter-spacing: 2px;
+        }
+
+        p { 
+            text-align: center; 
+            color: #a0a5c0; 
+            font-size: 0.95rem; 
+            margin-bottom: 25px; 
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 1.1rem; 
+            font-weight: bold;
+            border-radius: 30px; 
+            cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+            width: 85%; 
+            margin: 10px 0; 
+            transform: scale(1); 
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        .btn:active { 
+            transform: scale(0.96); 
+        }
+
+        .btn-diff { 
+            background: linear-gradient(135deg, #4776e6, #8e54e9); 
+            box-shadow: 0 5px 15px rgba(142, 84, 233, 0.4); 
+        }
+
+        /* HUD Permainan */
+        #hud {
+            display: flex; 
+            justify-content: space-between; 
+            width: 100%; 
+            padding: 15px;
+            background: rgba(25, 27, 41, 0.85); 
+            border-bottom: 2px solid #2a2d42; 
+            z-index: 5;
+        }
+
+        .hud-item { 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            color: #00ffcc; 
+            text-shadow: 0 0 5px rgba(0,255,204,0.3);
+        }
+
+        #timer { 
+            color: #ff3e3e; 
+            text-shadow: 0 0 5px rgba(255,62,62,0.3);
+        }
+
+        /* Medan Canvas */
+        #canvas-container { 
+            flex: 1; 
+            position: relative; 
+            width: 100%; 
+        }
+
+        canvas { 
+            width: 100%; 
+            height: 100%; 
+            display: block; 
+        }
+
+        /* Panel Kawalan Meriam */
+        #control-panel {
+            background: #151722; 
+            border-top: 3px solid #2a2d42; 
+            padding: 15px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            z-index: 5;
+        }
+
+        .section-title { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #8e54e9; 
+            font-weight: bold;
+        }
+
+        #ammo-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; 
+            width: 100%; 
+        }
+
+        .ammo-btn {
+            background: #222533; 
+            border: 2px solid #3d4363; 
+            border-radius: 12px;
+            color: #fff; 
+            font-size: 1.6rem; 
+            font-weight: bold; 
+            padding: 12px 0;
+            cursor: pointer; 
+            transition: all 0.1s; 
+            box-shadow: inset 0 -4px 0 #13151f;
+        }
+
+        .ammo-btn:active { 
+            transform: translateY(2px); 
+            box-shadow: inset 0 -1px 0 #13151f; 
+        }
+
+        #chain-container {
+            width: 100%; 
+            background: #0a0b10; 
+            border: 1px dashed #3d4363;
+            border-radius: 8px; 
+            padding: 8px; 
+            min-height: 46px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            flex-wrap: wrap;
+        }
+
+        .chain-node { 
+            background: #8e54e9; 
+            padding: 4px 12px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 1rem; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .chain-symbol { 
+            color: #ff4b2b; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- MENU UTAMA -->
+        <div id="menu-screen" class="screen">
+            <h1>PRIME SIEGE</h1>
+            <p>DSKP Matematik Tingkatan 1<br>Bab 2: Faktor & Gandaan (2.1.1 & 2.1.2)</p>
+            <button class="btn btn-diff" onclick="showDifficulty()">MULA PERTAHANAN</button>
+        </div>
+
+        <!-- PILIHAN TAHAP KESUKARAN -->
+        <div id="difficulty-screen" class="screen hidden">
+            <h1>PILIH INTENSITI</h1>
+            <p>Semakin tinggi tahap, semakin ganas raksasa angka!</p>
+            <button class="btn" style="background: #00cc7a; box-shadow: 0 5px 15px rgba(0,204,122,0.4);" onclick="startGame('mudah')">MUDAH (Faktor Asas)</button>
+            <button class="btn" style="background: #ffb300; box-shadow: 0 5px 15px rgba(255,179,0,0.4);" onclick="startGame('sederhana')">SEDERHANA (Angka 2-Digit)</button>
+            <button class="btn" style="background: #ff3e3e; box-shadow: 0 5px 15px rgba(255,62,62,0.4);" onclick="startGame('susah')">SUSAH (Ganas & Agresif)</button>
+        </div>
+
+        <!-- SKRIN TAMAT (MENANG/KALAH) -->
+        <div id="gameover-screen" class="screen hidden">
+            <h1 id="go-title">KUBU BOLOS!</h1>
+            <p id="go-desc">Raksasa berjaya merobohkan benteng faktor anda.</p>
+            <div id="final-chain-section" style="margin-bottom: 25px; width:100%; text-align:center;">
+                <span style="color:#a0a5c0; font-size:0.95rem;">Pemfaktoran Perdana Tepat:</span>
+                <div id="correct-ans-chain" style="margin-top:8px;"></div>
+            </div>
+            <button class="btn btn-diff" onclick="showDifficulty()">CUBA LAGI</button>
+            <button class="btn" style="background:#222533; box-shadow: none;" onclick="backToMenu()">MENU UTAMA</button>
+        </div>
+
+        <!-- HUD PERMAINAN -->
+        <div id="hud">
+            <div class="hud-item" id="score-display">SKOR: 0</div>
+            <div class="hud-item" id="timer">MASA: 45s</div>
+        </div>
+
+        <!-- MEDAN PERMAINAN (CANVAS) -->
+        <div id="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- PANEL KAWALAN MERIAM -->
+        <div id="control-panel">
+            <span class="section-title">Pemfaktoran Perdana Semasa</span>
+            <div id="chain-container"></div>
+            
+            <span class="section-title">Peluru Meriam Perdana</span>
+            <div id="ammo-grid">
+                <button class="ammo-btn" onclick="fireLaser(2)">2</button>
+                <button class="ammo-btn" onclick="fireLaser(3)">3</button>
+                <button class="ammo-btn" onclick="fireLaser(5)">5</button>
+                <button class="ammo-btn" onclick="fireLaser(7)">7</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State Permainan
+        let difficulty = 'mudah';
+        let score = 0;
+        let timeRemaining = 45;
+        let gameInterval, timerInterval;
+        let currentMonster = null;
+        let currentHP = 0;
+        let targetNumber = 0;
+        let primeFactorsChain = [];
+        let lasers = [];
+        let particles = [];
+        let flashColor = null;
+        let flashTicks = 0;
+
+        // Data Kurikulum DSKP Bab 2 Matematik Tingkatan 1
+        const numberPool = {
+            mudah:,
+            sederhana:,
+            susah: [90, 98, 100, 105, 108, 120, 126, 135, 140, 150, 168, 180]
+        };
+
+        // Mengawal saiz responsif medan grafik canvas
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                canvas.width = container.clientWidth;
