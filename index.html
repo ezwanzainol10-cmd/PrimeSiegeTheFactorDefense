@@ -3,78 +3,462 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prime Siege: The Factor Defense</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRIME SIEGE - THE FACTOR DEFENSE</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#070b14;color:#edf5ff;font-family:Arial,system-ui,sans-serif}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 20%,#1b315344,transparent 55%)}
-.hud{min-height:82px;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;background:#0c1220;border-bottom:1px solid #27384f;position:sticky;top:0;z-index:20;gap:12px}
-h1{margin:0;font-size:25px;letter-spacing:3px;color:#78e9ff;text-shadow:0 0 18px #2bd9ff55}
-.hud p{margin:3px 0;color:#7489a5;font-size:11px;letter-spacing:2px}
-.stats{display:flex;gap:8px}
-.stats span{padding:8px 11px;border:1px solid #30445e;background:#111b2a;border-radius:9px;font-size:10px;color:#8194ad}
-.stats b{display:block;color:#fff;font-size:16px;margin-top:2px}
-.audio-controls{display:flex;gap:7px}
-.audio-controls button{border:1px solid #38536e;background:#122033;color:#bcefff;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:bold}
-main{max-width:1250px;margin:auto;padding:18px}
-.arena{height:510px;position:relative;overflow:hidden;border:1px solid #2c425d;border-radius:18px;background:#0b1422;box-shadow:0 20px 80px #0009}
-.sky{position:absolute;inset:0 0 42%;background:linear-gradient(#0b142a,#152844)}
-.moon{position:absolute;right:10%;top:12%;width:70px;height:70px;border-radius:50%;background:#d9e8ed;box-shadow:0 0 35px #cdefff66}
-.mountain{position:absolute;bottom:39%;width:55%;height:30%;background:#111b2c;clip-path:polygon(0 100%,30% 28%,46% 65%,66% 10%,100% 100%);opacity:.9}
-.m1{left:-5%}.m2{right:-10%;transform:scaleX(-1)}
-.ground{position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(#1a281f,#101914);border-top:2px solid #354d3d}
-.ground:after{content:"";position:absolute;left:8%;right:7%;top:48%;height:6px;background:#52674c;box-shadow:0 18px #1b3025}
-.cannon{position:absolute;right:7%;bottom:15%;width:250px;z-index:8;filter:drop-shadow(0 15px 12px #0009)}
+
+body{
+ margin:0;
+ background:#070b14;
+ color:#edf5ff;
+ font-family:Arial,system-ui,sans-serif;
+}
+
+.hud{
+ min-height:82px;
+ padding:13px 24px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:12px;
+ background:#0c1220;
+ border-bottom:1px solid #27384f;
+ position:sticky;
+ top:0;
+ z-index:20;
+}
+
+h1{
+ margin:0;
+ font-size:25px;
+ letter-spacing:3px;
+ color:#78e9ff;
+ text-shadow:0 0 18px #2bd9ff55;
+}
+
+.hud p{
+ margin:3px 0;
+ color:#7489a5;
+ font-size:11px;
+ letter-spacing:2px;
+}
+
+.stats,.audio-controls{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+
+.stats span{
+ padding:8px 11px;
+ border:1px solid #30445e;
+ background:#111b2a;
+ border-radius:9px;
+ font-size:10px;
+ color:#8194ad;
+}
+
+.stats b{
+ display:block;
+ color:white;
+ font-size:16px;
+ margin-top:2px;
+}
+
+button{
+ cursor:pointer;
+}
+
+.audio-controls button{
+ border:1px solid #38536e;
+ background:#122033;
+ color:#bcefff;
+ border-radius:8px;
+ padding:9px 12px;
+ font-weight:bold;
+}
+
+main{
+ max-width:1250px;
+ margin:auto;
+ padding:18px;
+}
+
+.arena{
+ height:510px;
+ position:relative;
+ overflow:hidden;
+ border:1px solid #2c425d;
+ border-radius:18px;
+ background:#0b1422;
+ box-shadow:0 20px 80px #0009;
+}
+
+.sky{
+ position:absolute;
+ inset:0 0 42%;
+ background:linear-gradient(#0b142a,#152844);
+}
+
+.moon{
+ position:absolute;
+ right:10%;
+ top:12%;
+ width:70px;
+ height:70px;
+ border-radius:50%;
+ background:#d9e8ed;
+ box-shadow:0 0 35px #cdefff66;
+}
+
+.mountain{
+ position:absolute;
+ bottom:39%;
+ width:55%;
+ height:30%;
+ background:#111b2c;
+ clip-path:polygon(0 100%,30% 28%,46% 65%,66% 10%,100% 100%);
+}
+
+.m1{left:-5%}
+.m2{right:-10%;transform:scaleX(-1)}
+
+.ground{
+ position:absolute;
+ inset:auto 0 0;
+ height:42%;
+ background:linear-gradient(#1a281f,#101914);
+ border-top:2px solid #354d3d;
+}
+
+.ground:after{
+ content:"";
+ position:absolute;
+ left:8%;
+ right:7%;
+ top:48%;
+ height:6px;
+ background:#52674c;
+ box-shadow:0 18px #1b3025;
+}
+
+.beast{
+ position:absolute;
+ left:5%;
+ bottom:13%;
+ width:220px;
+ height:230px;
+ z-index:7;
+ filter:drop-shadow(0 16px 10px #000b);
+ transition:left .08s linear;
+}
+
+.beast svg{
+ width:100%;
+ height:100%;
+}
+
+.beast strong{
+ position:absolute;
+ top:69px;
+ left:0;
+ right:0;
+ text-align:center;
+ font-size:26px;
+ text-shadow:0 2px 3px #000;
+}
+
+.beast small{
+ position:absolute;
+ top:99px;
+ left:0;
+ right:0;
+ text-align:center;
+ font-size:9px;
+ letter-spacing:2px;
+ color:#ffd5d5;
+}
+
+.beast-hp{
+ position:absolute;
+ top:-9px;
+ left:12px;
+ right:12px;
+ height:9px;
+ border-radius:9px;
+ background:#25151c;
+ border:1px solid #7a4050;
+ overflow:hidden;
+}
+
+.beast-hp i{
+ display:block;
+ height:100%;
+ width:100%;
+ background:#5cf48d;
+ transition:.2s;
+}
+
+.number-type{
+ display:block;
+ margin-top:3px;
+ font-size:10px;
+ font-weight:800;
+ color:#9ff3ff;
+}
+
+.cannon{
+ position:absolute;
+ right:7%;
+ bottom:15%;
+ width:250px;
+ z-index:8;
+ filter:drop-shadow(0 15px 12px #0009);
+}
+
 .cannon svg{width:100%}
-.cannon-label{position:absolute;bottom:-6px;left:55px;font-size:10px;letter-spacing:2px;color:#72e8ff;font-weight:bold}
-.beast{position:absolute;left:5%;bottom:13%;width:220px;height:230px;z-index:7;transition:left .08s linear;filter:drop-shadow(0 16px 10px #000b)}
-.beast svg{width:100%;height:100%}
-.beast strong{position:absolute;top:69px;left:0;right:0;text-align:center;font-size:26px;text-shadow:0 2px 3px #000}
-.beast small{position:absolute;top:99px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:2px;color:#ffd5d5}
-.beast-hp{position:absolute;top:-9px;left:12px;right:12px;height:9px;border-radius:9px;background:#25151c;border:1px solid #7a4050;overflow:hidden}
-.beast-hp i{display:block;height:100%;width:100%;background:#5cf48d;transition:.2s}
-.number-type{display:block;margin-top:3px;font-size:clamp(8px,1vw,11px);font-style:normal;font-weight:800;letter-spacing:.08em;color:#9ff3ff;text-shadow:0 1px 5px #07111d}
-.message{position:absolute;top:18px;left:50%;transform:translateX(-50%);background:#080d18ee;border:1px solid #45617d;padding:9px 15px;border-radius:20px;font-weight:bold;opacity:0;transition:.2s;z-index:15;white-space:nowrap}
+
+.cannon-label{
+ position:absolute;
+ bottom:-6px;
+ left:55px;
+ font-size:10px;
+ letter-spacing:2px;
+ color:#72e8ff;
+ font-weight:bold;
+}
+
+.message{
+ position:absolute;
+ top:18px;
+ left:50%;
+ transform:translateX(-50%);
+ background:#080d18ee;
+ border:1px solid #45617d;
+ padding:9px 15px;
+ border-radius:20px;
+ font-weight:bold;
+ opacity:0;
+ transition:.2s;
+ z-index:15;
+ white-space:nowrap;
+ pointer-events:none;
+}
+
 .message.show{opacity:1}
-.control-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}
-.panel{background:#0d1625;border:1px solid #293c55;border-radius:15px;padding:15px}
-.panel h2{margin:0 0 8px;color:#8feeff;font-size:14px}
-.panel p,.panel li{color:#8da0b8;font-size:12px;line-height:1.6}
-.ammo{display:flex;gap:8px;flex-wrap:wrap}
-.ammo button{min-width:52px;padding:10px;border:1px solid #3b5572;background:#17263a;color:#eaf5ff;border-radius:9px;font-weight:bold;cursor:pointer}
-.ammo button:hover{background:#25415c}
-.ammo button:disabled{opacity:.25}
-.restart{margin-top:9px;border:0;background:#39d0ed;color:#03121b;padding:10px 15px;border-radius:8px;font-weight:bold;cursor:pointer}
-.modal{position:fixed;inset:0;background:#03060ddd;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.hidden{display:none}
-.modal-card{max-width:650px;width:100%;background:#101b2d;border:1px solid #4a6686;border-radius:18px;padding:22px;text-align:center}
+
+.control-grid{
+ display:grid;
+ grid-template-columns:1.4fr 1fr;
+ gap:14px;
+ margin-top:14px;
+}
+
+.panel{
+ background:#0d1625;
+ border:1px solid #293c55;
+ border-radius:15px;
+ padding:15px;
+}
+
+.panel h2{
+ margin:0 0 8px;
+ color:#8feeff;
+ font-size:14px;
+}
+
+.panel p,.panel li{
+ color:#8da0b8;
+ font-size:12px;
+ line-height:1.7;
+}
+
+.ammo{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+
+.ammo button{
+ min-width:52px;
+ padding:12px;
+ border:1px solid #3b5572;
+ background:#17263a;
+ color:#eaf5ff;
+ border-radius:9px;
+ font-weight:bold;
+ font-size:15px;
+}
+
+.ammo button:hover{
+ background:#25415c;
+ transform:translateY(-2px);
+}
+
+.ammo button:disabled{
+ opacity:.25;
+ cursor:not-allowed;
+}
+
+.restart{
+ margin-top:9px;
+ border:0;
+ background:#39d0ed;
+ color:#03121b;
+ padding:10px 15px;
+ border-radius:8px;
+ font-weight:bold;
+}
+
+.modal{
+ position:fixed;
+ inset:0;
+ background:#03060ddd;
+ z-index:100;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+ overflow-y:auto;
+}
+
+.hidden{display:none!important}
+
+.modal-card{
+ max-width:650px;
+ width:100%;
+ background:#101b2d;
+ border:1px solid #4a6686;
+ border-radius:18px;
+ padding:22px;
+ text-align:center;
+}
+
 .modal-card h2{color:#80ecff}
-.prime{display:inline-block;margin:5px;padding:11px 15px;border:1px solid #d7a93e;background:#382d13;color:#ffe18b;border-radius:9px;font-weight:bold}
-.formula button{margin:5px;padding:12px 17px;border-radius:9px;border:1px solid #49678a;background:#17263c;color:#fff;font-weight:bold;cursor:pointer}
-.formula button.ok{background:#4b3a13;border-color:#ffd45b;color:#ffe59b}
-.beast.hit{animation:beastHit .22s ease}
-.beast.hit svg{filter:brightness(1.7) saturate(1.5)}
-@keyframes beastHit{0%{transform:translateX(0)}25%{transform:translateX(-9px) rotate(-3deg)}55%{transform:translateX(10px) rotate(3deg)}100%{transform:translateX(0)}}
-.beast.defeat{animation:beastDefeat .8s ease forwards}
-@keyframes beastDefeat{0%{transform:scale(1);opacity:1}55%{transform:scale(1.12) rotate(8deg);opacity:1}100%{transform:scale(.2) rotate(25deg);opacity:0}}
-.shot{position:absolute;width:16px;height:16px;border-radius:50%;background:#eaffff;box-shadow:0 0 12px #74ecff,0 0 30px #fff;z-index:12;pointer-events:none}
-.muzzle-flash{position:absolute;right:18%;bottom:31%;width:85px;height:85px;border-radius:50%;background:radial-gradient(circle,#fff 0 8%,#ffe46d 15%,#ff9c35 35%,transparent 68%);opacity:0;z-index:10;pointer-events:none}
-.muzzle-flash.fire{animation:muzzle .18s ease-out}
-@keyframes muzzle{0%{opacity:1;transform:scale(.5)}100%{opacity:0;transform:scale(1.35)}}
-.cannon.cannon-explode{animation:cannonExplosion .62s cubic-bezier(.2,.7,.3,1) forwards;transform-origin:65% 70%;filter:drop-shadow(0 0 18px #ff6b2b)}
-@keyframes cannonExplosion{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}18%{transform:translate(-7px,2px) rotate(-4deg) scale(1.04);filter:brightness(2)}38%{transform:translate(8px,-5px) rotate(5deg) scale(1.12);filter:brightness(2.8) drop-shadow(0 0 25px #ff5c24)}65%{transform:translate(-5px,-13px) rotate(-8deg) scale(.95);opacity:.8}100%{transform:translate(0,18px) rotate(14deg) scale(.55);opacity:0}}
-.play-again{margin:12px auto 0;padding:13px 24px;border:0;border-radius:10px;background:linear-gradient(135deg,#62efff,#29b9e5);color:#04111c;font-weight:900;letter-spacing:1px;cursor:pointer;box-shadow:0 0 22px #39d0ed33}
-.play-again:hover{filter:brightness(1.12);transform:translateY(-1px)}
+
+.prime{
+ display:inline-block;
+ margin:5px;
+ padding:11px 15px;
+ border:1px solid #d7a93e;
+ background:#382d13;
+ color:#ffe18b;
+ border-radius:9px;
+ font-weight:bold;
+}
+
+.formula button{
+ margin:5px;
+ padding:12px 17px;
+ border-radius:9px;
+ border:1px solid #49678a;
+ background:#17263c;
+ color:white;
+ font-weight:bold;
+}
+
+.formula button.ok{
+ background:#4b3a13;
+ border-color:#ffd45b;
+ color:#ffe59b;
+}
+
+.play-again{
+ margin:12px auto 0;
+ padding:13px 24px;
+ border:0;
+ border-radius:10px;
+ background:linear-gradient(135deg,#62efff,#29b9e5);
+ color:#04111c;
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+.shot{
+ position:absolute;
+ width:16px;
+ height:16px;
+ border-radius:50%;
+ background:#eaffff;
+ box-shadow:0 0 12px #74ecff,0 0 30px white;
+ z-index:12;
+ pointer-events:none;
+}
+
+.muzzle-flash{
+ position:absolute;
+ right:18%;
+ bottom:31%;
+ width:85px;
+ height:85px;
+ border-radius:50%;
+ background:radial-gradient(circle,#fff 0 8%,#ffe46d 15%,#ff9c35 35%,transparent 68%);
+ opacity:0;
+ z-index:10;
+}
+
+.muzzle-flash.fire{
+ animation:muzzle .18s ease-out;
+}
+
+@keyframes muzzle{
+ 0%{opacity:1;transform:scale(.5)}
+ 100%{opacity:0;transform:scale(1.35)}
+}
+
+.beast.hit{
+ animation:beastHit .22s ease;
+}
+
+@keyframes beastHit{
+ 0%{transform:translateX(0)}
+ 25%{transform:translateX(-9px) rotate(-3deg)}
+ 55%{transform:translateX(10px) rotate(3deg)}
+ 100%{transform:translateX(0)}
+}
+
+.beast.defeat{
+ animation:beastDefeat .8s ease forwards;
+}
+
+@keyframes beastDefeat{
+ 0%{transform:scale(1);opacity:1}
+ 55%{transform:scale(1.12) rotate(8deg);opacity:1}
+ 100%{transform:scale(.2) rotate(25deg);opacity:0}
+}
+
+.cannon.cannon-explode{
+ animation:cannonExplosion .62s forwards;
+ transform-origin:65% 70%;
+}
+
+@keyframes cannonExplosion{
+ 0%{transform:translate(0,0) rotate(0) scale(1)}
+ 18%{transform:translate(-7px,2px) rotate(-4deg) scale(1.04);filter:brightness(2)}
+ 38%{transform:translate(8px,-5px) rotate(5deg) scale(1.12);filter:brightness(3)}
+ 65%{transform:translate(-5px,-13px) rotate(-8deg);opacity:.8}
+ 100%{transform:translate(0,18px) rotate(14deg) scale(.55);opacity:0}
+}
+
 @media(max-width:800px){
- .hud{height:auto;align-items:flex-start;gap:10px;flex-direction:column}
- .stats{flex-wrap:wrap}
+ .hud{
+  flex-direction:column;
+  align-items:flex-start;
+ }
  .arena{height:430px}
- .cannon{transform:scale(.72);transform-origin:bottom right;right:-2%}
- .beast{transform:scale(.72);transform-origin:bottom left;left:4%}
+ .cannon{
+  transform:scale(.72);
+  transform-origin:bottom right;
+  right:-2%;
+ }
+ .beast{
+  transform:scale(.72);
+  transform-origin:bottom left;
+ }
  .control-grid{grid-template-columns:1fr}
- .audio-controls{margin-left:0}
 }
 </style>
 </head>
@@ -82,651 +466,914 @@ main{max-width:1250px;margin:auto;padding:18px}
 <body>
 
 <header class="hud">
-<div>
-<h1>PRIME SIEGE</h1>
-<p>THE FACTOR DEFENSE • TINGKATAN 1</p>
-</div>
+ <div>
+  <h1>PRIME SIEGE</h1>
+  <p>THE FACTOR DEFENSE • TINGKATAN 1</p>
+ </div>
 
-<div class="audio-controls">
-<button id="soundToggle">🔊 SOUND ON</button>
-<button id="musicToggle">🎵 MUSIC ON</button>
-</div>
+ <div class="audio-controls">
+  <button id="soundToggle">🔊 SOUND ON</button>
+  <button id="musicToggle">🎵 MUSIC ON</button>
+ </div>
 
-<div class="stats">
-<span>SKOR <b id="score">0</b></span>
-<span>KUBU <b id="baseHp">100%</b></span>
-<span>LEVEL <b id="level">1</b></span>
-<span>COMBO <b id="combo">0</b></span>
-</div>
+ <div class="stats">
+  <span>SKOR<b id="score">0</b></span>
+  <span>KUBU<b id="baseHp">100%</b></span>
+  <span>LEVEL<b id="level">1</b></span>
+  <span>COMBO<b id="combo">0</b></span>
+ </div>
 </header>
 
 <main>
 <section id="arena" class="arena">
-<div class="sky"></div>
-<div class="moon"></div>
-<div class="mountain m1"></div>
-<div class="mountain m2"></div>
-<div class="ground"></div>
 
-<div id="beast" class="beast">
-<svg viewBox="0 0 240 230" aria-label="Number Beast">
-<defs>
-<radialGradient id="skin" cx="35%" cy="25%">
-<stop offset="0" stop-color="#ff9a83"/>
-<stop offset=".55" stop-color="#c43855"/>
-<stop offset="1" stop-color="#5b183b"/>
-</radialGradient>
-<linearGradient id="horn" x2="0" y2="1">
-<stop stop-color="#fff2c2"/>
-<stop offset="1" stop-color="#8b6637"/>
-</linearGradient>
-</defs>
-<ellipse cx="120" cy="212" rx="82" ry="11" fill="#000" opacity=".45"/>
-<path d="M55 145 Q22 163 42 190 Q62 203 78 174" fill="#74203e" stroke="#ff8190" stroke-width="5"/>
-<path d="M185 145 Q218 163 198 190 Q178 203 162 174" fill="#74203e" stroke="#ff8190" stroke-width="5"/>
-<path d="M60 92 Q48 35 83 25 Q100 54 120 62 Q140 54 157 25 Q192 35 180 92 L190 137 Q177 181 120 188 Q63 181 50 137Z" fill="url(#skin)" stroke="#ff9a9f" stroke-width="6"/>
-<path d="M83 25 L72 2 L96 22" fill="url(#horn)" stroke="#d5b77b" stroke-width="4"/>
-<path d="M157 25 L168 2 L144 22" fill="url(#horn)" stroke="#d5b77b" stroke-width="4"/>
-<path d="M81 103 Q98 90 112 104" fill="none" stroke="#fff" stroke-width="8"/>
-<path d="M159 103 Q142 90 128 104" fill="none" stroke="#fff" stroke-width="8"/>
-<circle cx="101" cy="104" r="7" fill="#15101e"/>
-<circle cx="139" cy="104" r="7" fill="#15101e"/>
-<path d="M83 137 Q120 160 157 137 Q151 177 120 178 Q89 177 83 137Z" fill="#351127" stroke="#ff9a9f" stroke-width="4"/>
-<path d="M98 151 L104 168 L111 153 L119 171 L128 153 L137 168 L143 150" fill="#fff4df"/>
-<text x="120" y="77" text-anchor="middle" font-size="23" font-weight="900" fill="#ffe37b">N</text>
-</svg>
+ <div class="sky"></div>
+ <div class="moon"></div>
+ <div class="mountain m1"></div>
+ <div class="mountain m2"></div>
+ <div class="ground"></div>
 
-<div class="beast-hp"><i id="hpFill"></i></div>
-<strong id="beastNumber">40</strong>
-<em id="numberType" class="number-type">NOMBOR KOMPOSIT</em>
-<small id="beastName">IRON HORN</small>
-</div>
+ <div id="beast" class="beast">
+  <svg viewBox="0 0 240 230">
+   <defs>
+    <radialGradient id="skin" cx="35%" cy="25%">
+     <stop offset="0" stop-color="#ff9a83"/>
+     <stop offset=".55" stop-color="#c43855"/>
+     <stop offset="1" stop-color="#5b183b"/>
+    </radialGradient>
+    <linearGradient id="horn" x2="0" y2="1">
+     <stop stop-color="#fff2c2"/>
+     <stop offset="1" stop-color="#8b6637"/>
+    </linearGradient>
+   </defs>
 
-<div class="cannon">
-<svg viewBox="0 0 250 180" aria-label="Factor Cannon">
-<defs>
-<linearGradient id="metal" x2="0" y2="1">
-<stop stop-color="#8998ad"/>
-<stop offset=".45" stop-color="#344257"/>
-<stop offset="1" stop-color="#121a27"/>
-</linearGradient>
-</defs>
-<rect x="30" y="113" width="190" height="42" rx="8" fill="#1b2738" stroke="#6f8198" stroke-width="5"/>
-<circle cx="64" cy="135" r="25" fill="#101723" stroke="#7d91a7" stroke-width="6"/>
-<circle cx="186" cy="135" r="25" fill="#101723" stroke="#7d91a7" stroke-width="6"/>
-<path d="M76 113 Q82 82 111 75 L187 75 Q207 78 216 96 L216 113Z" fill="url(#metal)" stroke="#9aabba" stroke-width="5"/>
-<rect x="106" y="38" width="100" height="42" rx="20" transform="rotate(-12 106 38)" fill="url(#metal)" stroke="#aab9ca" stroke-width="5"/>
-<circle cx="202" cy="66" r="22" fill="#172335" stroke="#65e5ff" stroke-width="5"/>
-<circle cx="202" cy="66" r="9" fill="#dffbff"/>
-<path d="M53 113 L72 92" stroke="#f0bd5b" stroke-width="9"/>
-</svg>
-<div class="cannon-label">FACTOR CANNON</div>
-</div>
+   <ellipse cx="120" cy="212" rx="82" ry="11" fill="#000" opacity=".45"/>
+   <path d="M55 145 Q22 163 42 190 Q62 203 78 174" fill="#74203e" stroke="#ff8190" stroke-width="5"/>
+   <path d="M185 145 Q218 163 198 190 Q178 203 162 174" fill="#74203e" stroke="#ff8190" stroke-width="5"/>
+   <path d="M60 92 Q48 35 83 25 Q100 54 120 62 Q140 54 157 25 Q192 35 180 92 L190 137 Q177 181 120 188 Q63 181 50 137Z" fill="url(#skin)" stroke="#ff9a9f" stroke-width="6"/>
+   <path d="M83 25 L72 2 L96 22" fill="url(#horn)" stroke="#d5b77b" stroke-width="4"/>
+   <path d="M157 25 L168 2 L144 22" fill="url(#horn)" stroke="#d5b77b" stroke-width="4"/>
+   <path d="M81 103 Q98 90 112 104" fill="none" stroke="#fff" stroke-width="8"/>
+   <path d="M159 103 Q142 90 128 104" fill="none" stroke="#fff" stroke-width="8"/>
+   <circle cx="101" cy="104" r="7" fill="#15101e"/>
+   <circle cx="139" cy="104" r="7" fill="#15101e"/>
+   <path d="M83 137 Q120 160 157 137 Q151 177 120 178 Q89 177 83 137Z" fill="#351127" stroke="#ff9a9f" stroke-width="4"/>
+   <path d="M98 151 L104 168 L111 153 L119 171 L128 153 L137 168 L143 150" fill="#fff4df"/>
+   <text x="120" y="77" text-anchor="middle" font-size="23" font-weight="900" fill="#ffe37b">N</text>
+  </svg>
 
-<div id="message" class="message"></div>
+  <div class="beast-hp"><i id="hpFill"></i></div>
+  <strong id="beastNumber">40</strong>
+  <em id="numberType" class="number-type">NOMBOR KOMPOSIT</em>
+  <small id="beastName">IRON HORN</small>
+ </div>
+
+ <div class="cannon">
+  <svg viewBox="0 0 250 180">
+   <defs>
+    <linearGradient id="metal" x2="0" y2="1">
+     <stop stop-color="#8998ad"/>
+     <stop offset=".45" stop-color="#344257"/>
+     <stop offset="1" stop-color="#121a27"/>
+    </linearGradient>
+   </defs>
+   <rect x="30" y="113" width="190" height="42" rx="8" fill="#1b2738" stroke="#6f8198" stroke-width="5"/>
+   <circle cx="64" cy="135" r="25" fill="#101723" stroke="#7d91a7" stroke-width="6"/>
+   <circle cx="186" cy="135" r="25" fill="#101723" stroke="#7d91a7" stroke-width="6"/>
+   <path d="M76 113 Q82 82 111 75 L187 75 Q207 78 216 96 L216 113Z" fill="url(#metal)" stroke="#9aabba" stroke-width="5"/>
+   <rect x="106" y="38" width="100" height="42" rx="20" transform="rotate(-12 106 38)" fill="url(#metal)" stroke="#aab9ca" stroke-width="5"/>
+   <circle cx="202" cy="66" r="22" fill="#172335" stroke="#65e5ff" stroke-width="5"/>
+   <circle cx="202" cy="66" r="9" fill="#dffbff"/>
+   <path d="M53 113 L72 92" stroke="#f0bd5b" stroke-width="9"/>
+  </svg>
+  <div class="cannon-label">FACTOR CANNON</div>
+ </div>
+
+ <div id="message" class="message"></div>
 </section>
 
 <section class="control-grid">
-<div class="panel">
-<h2>🎯 MERIAM FAKTOR</h2>
-<p>Pilih nombor yang merupakan faktor raksasa. Nombor perdana hanya mempunyai faktor positif 1 dan dirinya sendiri.</p>
-<div id="ammo" class="ammo"></div>
-</div>
+ <div class="panel">
+  <h2>🎯 MERIAM FAKTOR</h2>
+  <p>
+   Pilih nombor yang merupakan faktor beast.
+   Nombor perdana hanya mempunyai faktor positif
+   1 dan dirinya sendiri.
+  </p>
+  <div id="ammo" class="ammo"></div>
+ </div>
 
-<div class="panel">
-<h2>📘 MISI</h2>
-<ol>
-<li>Serang dengan faktor yang tepat.</li>
-<li>Faktor salah → meriam overheat.</li>
-<li>Kumpul combo untuk skor tinggi.</li>
-<li>Setiap 4 level: <b>PRIME CORE BOSS</b>.</li>
-</ol>
-<button id="restart" class="restart">RESTART MISSION</button>
-</div>
+ <div class="panel">
+  <h2>📘 MISI</h2>
+  <ol>
+   <li>Serang menggunakan faktor yang tepat.</li>
+   <li>Faktor salah menyebabkan beast memecut.</li>
+   <li>Kumpul combo untuk skor tinggi.</li>
+   <li>Setiap 4 level: PRIME CORE BOSS.</li>
+  </ol>
+  <button id="restart" class="restart">RESTART MISSION</button>
+ </div>
 </section>
 </main>
 
 <div id="modal" class="modal hidden"></div>
 
 <script>
-const $=id=>document.getElementById(id);
+"use strict";
 
-let score=0,base=100,level=1,combo=0,maxHp=40,hp=40,x=5,speed=.045,alive=true,tickId;
-let hitFactors=new Set(),shotInFlight=false;
-let soundOn=true,musicOn=true,audioCtx=null,musicTimer=null,gameEnded=false;
+const $ = id => document.getElementById(id);
+
+let score=0;
+let base=100;
+let level=1;
+let combo=0;
+let maxHp=40;
+let hp=40;
+let x=5;
+let speed=.045;
+let alive=false;
+let tickId=null;
+let hitFactors=new Set();
+let shotInFlight=false;
+let soundOn=true;
+let musicOn=true;
+let audioCtx=null;
+let musicTimer=null;
+let gameEnded=false;
+let bossTimer=null;
+let bossDeadline=0;
+let bossTarget=[];
+let bossPosition=0;
+let currentBeast=null;
+let lastPointer=null;
 
 const BEASTS=[
-{name:"IRON HORN",type:"Tank Beast",color:"#c43855",numbers:[29,40,60,80,90],speed:.80},
-{name:"FANG REAVER",type:"Swift Beast",color:"#8b42c9",numbers:[31,24,36,48,72],speed:1.35},
-{name:"STONE MAULER",type:"Heavy Beast",color:"#6d7885",numbers:[37,42,54,84,96],speed:.62},
-{name:"EMBER FIEND",type:"Fire Beast",color:"#e26a28",numbers:[41,30,45,60,75],speed:1.05},
-{name:"VOID STALKER",type:"Shadow Beast",color:"#273a8f",numbers:[43,56,63,70,98],speed:1.18}
+ {name:"IRON HORN",numbers:[29,40,60,80,90],speed:.80},
+ {name:"FANG REAVER",numbers:[31,24,36,48,72],speed:1.35},
+ {name:"STONE MAULER",numbers:[37,42,54,84,96],speed:.62},
+ {name:"EMBER FIEND",numbers:[41,30,45,60,75],speed:1.05},
+ {name:"VOID STALKER",numbers:[43,56,63,70,98],speed:1.18}
 ];
 
+// MATEMATIK
+
 function factors(n){
-const a=[];
-for(let i=1;i<=Math.floor(Math.sqrt(n));i++){
-if(n%i===0){
-a.push(i);
-if(i!==n/i)a.push(n/i);
-}
-}
-return a.sort((x,y)=>x-y);
+ const result=[];
+ for(let i=1;i<=Math.sqrt(n);i++){
+  if(n%i===0){
+   result.push(i);
+   if(i!==n/i)result.push(n/i);
+  }
+ }
+ return result.sort((a,b)=>a-b);
 }
 
 function prime(n){
-if(n<2)return false;
-for(let i=2;i*i<=n;i++)if(n%i===0)return false;
-return true;
+ if(n<2)return false;
+ for(let i=2;i*i<=n;i++){
+  if(n%i===0)return false;
+ }
+ return true;
 }
 
-function pf(n){
-const a=[];
-for(let p=2;p*p<=n;p++)while(n%p===0){a.push(p);n/=p;}
-if(n>1)a.push(n);
-return a;
+function primeFactors(n){
+ const result=[];
+ for(let p=2;p*p<=n;p++){
+  while(n%p===0){
+   result.push(p);
+   n/=p;
+  }
+ }
+ if(n>1)result.push(n);
+ return result;
 }
 
-function pair(n){
-for(let i=2;i<=Math.floor(Math.sqrt(n));i++)
-if(n%i===0)return[i,n/i];
-return[n];
+function factorPair(n){
+ for(let i=2;i<=Math.sqrt(n);i++){
+  if(n%i===0)return [i,n/i];
+ }
+ return [n];
 }
+
+// AUDIO ENGINE
 
 function ensureAudio(){
-if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-if(audioCtx.state==="suspended")audioCtx.resume();
+ if(!audioCtx){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ }
+ if(audioCtx.state==="suspended"){
+  audioCtx.resume();
+ }
 }
 
-function tone(freq,dur=.08,type="sine",gain=.05){
-if(!soundOn)return;
-ensureAudio();
-const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-o.type=type;
-o.frequency.value=freq;
-g.gain.value=gain;
-o.connect(g);
-g.connect(audioCtx.destination);
-g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);
-o.start();
-o.stop(audioCtx.currentTime+dur);
+function tone(freq,dur=.08,type="sine",volume=.05){
+ if(!soundOn)return;
+ ensureAudio();
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+
+ osc.type=type;
+ osc.frequency.value=freq;
+ gain.gain.setValueAtTime(volume,audioCtx.currentTime);
+ gain.gain.exponentialRampToValueAtTime(
+  .0001,audioCtx.currentTime+dur
+ );
+
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start();
+ osc.stop(audioCtx.currentTime+dur);
 }
 
 function cannonSound(){
-tone(120,.06,"sawtooth",.09);
-setTimeout(()=>tone(620,.11,"square",.045),20);
+ tone(120,.12,"sawtooth",.12);
+ setTimeout(()=>tone(620,.11,"square",.06),20);
 }
 
 function hurtSound(){
-tone(180,.08,"sawtooth",.07);
-setTimeout(()=>tone(110,.16,"triangle",.055),55);
+ tone(180,.08,"sawtooth",.09);
+ setTimeout(()=>tone(110,.16,"triangle",.07),55);
 }
 
 function beastRoar(){
-if(!soundOn)return;
-ensureAudio();
-const now=audioCtx.currentTime;
-const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();
-osc.type="sawtooth";
-osc.frequency.setValueAtTime(145,now);
-osc.frequency.exponentialRampToValueAtTime(48,now+.42);
-filter.type="lowpass";
-filter.frequency.setValueAtTime(650,now);
-filter.frequency.exponentialRampToValueAtTime(180,now+.45);
-gain.gain.setValueAtTime(.0001,now);
-gain.gain.linearRampToValueAtTime(.15,now+.04);
-gain.gain.exponentialRampToValueAtTime(.0001,now+.48);
-osc.connect(filter);
-filter.connect(gain);
-gain.connect(audioCtx.destination);
-osc.start(now);
-osc.stop(now+.5);
+ if(!soundOn)return;
+ ensureAudio();
 
-const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
-o2.type="triangle";
-o2.frequency.setValueAtTime(310,now);
-o2.frequency.exponentialRampToValueAtTime(90,now+.3);
-g2.gain.setValueAtTime(.0001,now);
-g2.gain.linearRampToValueAtTime(.045,now+.03);
-g2.gain.exponentialRampToValueAtTime(.0001,now+.34);
-o2.connect(g2);
-g2.connect(audioCtx.destination);
-o2.start(now);
-o2.stop(now+.36);
+ const now=audioCtx.currentTime;
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+ const filter=audioCtx.createBiquadFilter();
+
+ osc.type="sawtooth";
+ osc.frequency.setValueAtTime(145,now);
+ osc.frequency.exponentialRampToValueAtTime(48,now+.42);
+
+ filter.type="lowpass";
+ filter.frequency.setValueAtTime(650,now);
+ filter.frequency.exponentialRampToValueAtTime(180,now+.45);
+
+ gain.gain.setValueAtTime(.0001,now);
+ gain.gain.linearRampToValueAtTime(.15,now+.04);
+ gain.gain.exponentialRampToValueAtTime(.0001,now+.48);
+
+ osc.connect(filter);
+ filter.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start(now);
+ osc.stop(now+.5);
 }
 
 function defeatSound(){
-[330,440,660,880].forEach((f,i)=>setTimeout(()=>tone(f,.18,"square",.045),i*70));
+ [330,440,660,880].forEach((f,i)=>{
+  setTimeout(()=>tone(f,.18,"square",.06),i*70);
+ });
 }
 
 function bossSound(){
-[110,165,220].forEach((f,i)=>setTimeout(()=>tone(f,.4,"sawtooth",.05),i*110));
+ [110,165,220,330].forEach((f,i)=>{
+  setTimeout(()=>tone(f,.4,"sawtooth",.06),i*110);
+ });
 }
 
 function explosionSound(){
-if(!soundOn)return;
-tone(75,.48,"sawtooth",.16);
-setTimeout(()=>tone(48,.65,"triangle",.13),80);
-setTimeout(()=>tone(210,.16,"square",.06),35);
+ if(!soundOn)return;
+ tone(75,.48,"sawtooth",.18);
+ setTimeout(()=>tone(48,.65,"triangle",.15),80);
+ setTimeout(()=>tone(210,.16,"square",.08),35);
 }
+
+// MUZIK PERANG ASLI
+// Dijana secara elektronik menggunakan Web Audio API.
+// Tidak memerlukan fail muzik luar.
 
 let musicBeat=0;
 
-function musicNote(freq,startAt,duration,wave="triangle",volume=.025){
-if(!audioCtx||!musicOn)return;
-const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-const filter=audioCtx.createBiquadFilter();
-osc.type=wave;
-osc.frequency.setValueAtTime(freq,startAt);
-filter.type="lowpass";
-filter.frequency.setValueAtTime(1800,startAt);
-gain.gain.setValueAtTime(.0001,startAt);
-gain.gain.linearRampToValueAtTime(volume,startAt+.025);
-gain.gain.exponentialRampToValueAtTime(.0001,startAt+duration);
-osc.connect(filter);
-filter.connect(gain);
-gain.connect(audioCtx.destination);
-osc.start(startAt);
-osc.stop(startAt+duration+.03);
+function musicNote(freq,start,duration,wave="triangle",volume=.025){
+ if(!audioCtx||!musicOn)return;
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+ const filter=audioCtx.createBiquadFilter();
+
+ osc.type=wave;
+ osc.frequency.setValueAtTime(freq,start);
+
+ filter.type="lowpass";
+ filter.frequency.setValueAtTime(1800,start);
+
+ gain.gain.setValueAtTime(.0001,start);
+ gain.gain.linearRampToValueAtTime(volume,start+.025);
+ gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+
+ osc.connect(filter);
+ filter.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start(start);
+ osc.stop(start+duration+.03);
+}
+
+function drum(start,volume=.12){
+ if(!audioCtx||!musicOn)return;
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+
+ osc.type="sine";
+ osc.frequency.setValueAtTime(90,start);
+ osc.frequency.exponentialRampToValueAtTime(35,start+.18);
+
+ gain.gain.setValueAtTime(volume,start);
+ gain.gain.exponentialRampToValueAtTime(.0001,start+.2);
+
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start(start);
+ osc.stop(start+.22);
 }
 
 function musicLoop(){
-if(!musicOn||!audioCtx||gameEnded)return;
-const now=audioCtx.currentTime;
-const roots=[110,98,130.81,87.31,110,146.83,98,82.41];
-const root=roots[musicBeat%roots.length];
-const melody=[1,1.1892,1.4983,1.7818,1.4983,1.1892,1,1.4983];
-musicNote(root,now,.42,"sawtooth",.045);
-musicNote(root*2,now,.18,"triangle",.03);
-musicNote(root*melody[musicBeat%melody.length]*2,now+.08,.22,"triangle",.055);
-musicNote(root*melody[(musicBeat+2)%melody.length]*2,now+.23,.19,"sine",.04);
-if(musicBeat%2===0)musicNote(55,now,.12,"sine",.065);
-musicBeat++;
+ if(!musicOn||!audioCtx||gameEnded)return;
+
+ const now=audioCtx.currentTime;
+
+ const roots=[110,110,82.41,98,130.81,98,87.31,110];
+ const melody=[1,1.1892,1.4983,1.7818,1.4983,1.1892,1,1.4983];
+
+ const root=roots[musicBeat%roots.length];
+
+ // Bassline perang
+ musicNote(root,now,.42,"sawtooth",.075);
+ musicNote(root/2,now,.5,"sine",.09);
+
+ // Lapisan orkestra
+ musicNote(root*2,now,.4,"triangle",.055);
+ musicNote(root*melody[musicBeat%8]*2,now+.08,.25,"triangle",.065);
+ musicNote(root*melody[(musicBeat+2)%8]*2,now+.23,.24,"sine",.05);
+
+ // Perkusi
+ if(musicBeat%2===0){
+  drum(now,.15);
+ }
+ if(musicBeat%4===2){
+  musicNote(55,now,.15,"square",.04);
+ }
+
+ musicBeat++;
 }
 
 function startMusic(){
-if(!musicOn||gameEnded)return;
-ensureAudio();
-if(audioCtx.state==="suspended")audioCtx.resume();
-clearInterval(musicTimer);
-musicBeat=0;
-musicLoop();
-musicTimer=setInterval(musicLoop,360);
+ if(!musicOn||gameEnded)return;
+
+ ensureAudio();
+ clearInterval(musicTimer);
+
+ musicBeat=0;
+ musicLoop();
+ musicTimer=setInterval(musicLoop,360);
 }
 
-function msg(t){
-$("message").textContent=t;
-$("message").classList.add("show");
-clearTimeout(msg.t);
-msg.t=setTimeout(()=>$("message").classList.remove("show"),1000);
+// PAPARAN
+
+function msg(text){
+ $("message").textContent=text;
+ $("message").classList.add("show");
+
+ clearTimeout(msg.timer);
+ msg.timer=setTimeout(()=>{
+  $("message").classList.remove("show");
+ },1300);
 }
 
-function ui(){
-$("score").textContent=score;
-$("baseHp").textContent=base+"%";
-$("level").textContent=level;
-$("combo").textContent=combo;
+function updateUI(){
+ $("score").textContent=score;
+ $("baseHp").textContent=base+"%";
+ $("level").textContent=level;
+ $("combo").textContent=combo;
 
-const fs=factors(maxHp);
-$("beastNumber").textContent=hitFactors.size>=fs.length?"":maxHp;
-$("hpFill").style.width=(100*(fs.length-hitFactors.size)/fs.length)+"%";
-$("beast").style.left=x+"%";
-$("beastName").textContent=window.beast?.name||"NUMBER BEAST";
-$("beastNumber").title=prime(maxHp)?"Nombor perdana":"Nombor komposit";
+ const fs=factors(maxHp);
+ const remaining=fs.length-hitFactors.size;
 
-const typeLabel=$("numberType");
-if(typeLabel)typeLabel.textContent=prime(maxHp)?"NOMBOR PERDANA":"NOMBOR KOMPOSIT";
+ $("beastNumber").textContent=remaining<=0?"":maxHp;
+ $("hpFill").style.width=(100*remaining/fs.length)+"%";
+
+ $("beast").style.left=x+"%";
+ $("beastName").textContent=currentBeast?.name||"NUMBER BEAST";
+
+ $("numberType").textContent=
+  prime(maxHp)?"NOMBOR PERDANA":"NOMBOR KOMPOSIT";
 }
+
+// BEAST
 
 function chooseBeast(){
-const b=BEASTS[Math.floor(Math.random()*BEASTS.length)];
-window.beast=b;
-maxHp=b.numbers[Math.floor(Math.random()*b.numbers.length)];
-hp=maxHp;
-x=5;
-hitFactors=new Set();
-shotInFlight=false;
-speed=(.038+level*.008)*b.speed;
-alive=true;
-document.documentElement.style.setProperty("--beast-color",b.color);
+ const b=BEASTS[Math.floor(Math.random()*BEASTS.length)];
+
+ currentBeast=b;
+ maxHp=b.numbers[Math.floor(Math.random()*b.numbers.length)];
+
+ hp=maxHp;
+ x=5;
+
+ hitFactors=new Set();
+ shotInFlight=false;
+
+ speed=(.038+level*.008)*b.speed;
+ alive=true;
+
+ $("beast").style.opacity="1";
+ $("beast").style.filter="drop-shadow(0 16px 10px #000b)";
 }
 
 function start(){
-clearInterval(tickId);
-const beastEl=$("beast");
-beastEl.classList.remove("defeat","hit");
-beastEl.style.opacity="1";
-beastEl.style.transform="";
-chooseBeast();
-ammo();
-ui();
-tickId=setInterval(move,50);
+ clearInterval(tickId);
+
+ $("beast").classList.remove("defeat","hit");
+ $("beast").style.opacity="1";
+ $("beast").style.transform="";
+
+ chooseBeast();
+ createAmmo();
+ updateUI();
+
+ tickId=setInterval(move,50);
 }
 
 function move(){
-if(!alive||gameEnded||shotInFlight)return;
-x+=speed;
-if(x>78){
-x=78;
-alive=false;
-clearInterval(tickId);
-base=0;
-combo=0;
-ui();
-triggerGameOver();
-return;
-}
-ui();
-}
+ if(!alive||gameEnded||shotInFlight)return;
 
-function ammo(){
-const fs=factors(maxHp);
-let choices=[...fs];
+ x+=speed;
 
-while(choices.length<Math.max(10,fs.length)){
-const n=2+Math.floor(Math.random()*Math.max(39,maxHp+10));
-if(!fs.includes(n)&&!choices.includes(n))choices.push(n);
+ if(x>78){
+  x=78;
+  alive=false;
+  clearInterval(tickId);
+
+  base=0;
+  combo=0;
+
+  updateUI();
+  triggerGameOver();
+  return;
+ }
+
+ updateUI();
 }
 
-if(choices.length>14){
-const distractors=choices.filter(n=>!fs.includes(n));
-choices=[...fs,...distractors.slice(0,Math.max(0,14-fs.length))];
+// PELURU FAKTOR
+
+function createAmmo(){
+ const fs=factors(maxHp);
+ let choices=[...fs];
+
+ while(choices.length<Math.max(10,fs.length)){
+  const n=2+Math.floor(Math.random()*Math.max(39,maxHp+10));
+
+  if(!fs.includes(n)&&!choices.includes(n)){
+   choices.push(n);
+  }
+ }
+
+ if(choices.length>14){
+  const distractors=choices.filter(n=>!fs.includes(n));
+  choices=[
+   ...fs,
+   ...distractors.slice(0,Math.max(0,14-fs.length))
+  ];
+ }
+
+ choices.sort(()=>Math.random()-.5);
+
+ $("ammo").innerHTML="";
+
+ choices.forEach(n=>{
+  const b=document.createElement("button");
+  b.textContent=n;
+  b.onclick=()=>shoot(n,b);
+  $("ammo").appendChild(b);
+ });
 }
 
-choices.sort(()=>Math.random()-.5);
-$("ammo").innerHTML="";
-
-choices.forEach(n=>{
-const b=document.createElement("button");
-b.textContent=n;
-b.setAttribute("aria-label",String(n));
-b.onclick=()=>shoot(n,b);
-$("ammo").appendChild(b);
-});
-}
+// ANIMASI TEMBAKAN
 
 function animateShot(){
-shotInFlight=true;
-setTimeout(()=>{shotInFlight=false},250);
+ shotInFlight=true;
+ setTimeout(()=>shotInFlight=false,250);
 
-const arena=$("arena");
-const c=document.querySelector(".cannon");
-const beast=$("beast");
-const a=arena.getBoundingClientRect();
-const cr=c.getBoundingClientRect();
-const br=beast.getBoundingClientRect();
+ const arena=$("arena");
+ const cannon=document.querySelector(".cannon");
+ const beast=$("beast");
 
-const s=document.createElement("div");
-s.className="shot";
-s.style.left=(cr.left-a.left+cr.width*.75)+"px";
-s.style.top=(cr.top-a.top+cr.height*.38)+"px";
-arena.appendChild(s);
+ const a=arena.getBoundingClientRect();
+ const cr=cannon.getBoundingClientRect();
+ const br=beast.getBoundingClientRect();
 
-const ex=br.left-a.left+br.width*.45;
-const ey=br.top-a.top+br.height*.5;
-const sx=parseFloat(s.style.left);
-const sy=parseFloat(s.style.top);
-const dx=ex-sx,dy=ey-sy;
+ const s=document.createElement("div");
+ s.className="shot";
 
-s.animate([
-{transform:"translate(0,0) scale(1)"},
-{transform:`translate(${dx}px,${dy}px) scale(.45)`}
-],{duration:240,easing:"cubic-bezier(.2,.8,.2,1)"});
+ s.style.left=(cr.left-a.left+cr.width*.75)+"px";
+ s.style.top=(cr.top-a.top+cr.height*.38)+"px";
 
-setTimeout(()=>s.remove(),250);
+ arena.appendChild(s);
 
-const mf=document.createElement("div");
-mf.className="muzzle-flash";
-arena.appendChild(mf);
-mf.classList.add("fire");
-setTimeout(()=>mf.remove(),220);
-cannonSound();
+ const ex=br.left-a.left+br.width*.45;
+ const ey=br.top-a.top+br.height*.5;
+
+ const sx=parseFloat(s.style.left);
+ const sy=parseFloat(s.style.top);
+
+ s.animate([
+  {transform:"translate(0,0) scale(1)"},
+  {transform:`translate(${ex-sx}px,${ey-sy}px) scale(.45)`}
+ ],{
+  duration:240,
+  easing:"cubic-bezier(.2,.8,.2,1)"
+ });
+
+ setTimeout(()=>s.remove(),250);
+
+ const flash=document.createElement("div");
+ flash.className="muzzle-flash";
+ arena.appendChild(flash);
+
+ flash.classList.add("fire");
+ setTimeout(()=>flash.remove(),220);
+
+ cannonSound();
 }
 
-function shoot(n,b){
-if(!alive||gameEnded||b.disabled)return;
+// LOGIK SERANGAN
 
-b.disabled=true;
-animateShot();
+function shoot(n,button){
+ if(!alive||gameEnded||button.disabled)return;
 
-const fs=factors(maxHp);
-const ok=fs.includes(n);
-beastRoar();
+ button.disabled=true;
+ animateShot();
 
-const beastEl=$("beast");
-beastEl.classList.remove("hit");
-void beastEl.offsetWidth;
-beastEl.classList.add("hit");
+ const fs=factors(maxHp);
+ const correct=fs.includes(n);
 
-if(ok){
-if(!hitFactors.has(n)){
-hitFactors.add(n);
-hp=fs.length-hitFactors.size;
-combo++;
-score+=10+combo*3;
-hurtSound();
-msg("✓ Faktor "+n+" tepat! "+hitFactors.size+"/"+fs.length+" faktor ditembak.");
-}else{
-msg("Faktor ini sudah ditembak.");
+ const beast=$("beast");
+
+ beast.classList.remove("hit");
+ void beast.offsetWidth;
+ beast.classList.add("hit");
+
+ beastRoar();
+
+ if(correct){
+
+  if(!hitFactors.has(n)){
+   hitFactors.add(n);
+
+   hp=fs.length-hitFactors.size;
+
+   combo++;
+   score+=10+combo*3;
+
+   hurtSound();
+
+   msg("✓ FAKTOR "+n+" TEPAT! "+hitFactors.size+"/"+fs.length);
+  }else{
+   msg("Faktor ini sudah ditembak.");
+  }
+
+  if(hitFactors.size===fs.length){
+   alive=false;
+   clearInterval(tickId);
+
+   $("beastNumber").textContent="";
+   beast.classList.add("defeat");
+
+   score+=100;
+   level++;
+
+   defeatSound();
+
+   msg("🏆 SEMUA FAKTOR DITEMBAK! BEAST DITUMPASKAN!");
+
+   updateUI();
+
+   setTimeout(()=>{
+    if(!gameEnded){
+     if(level%4===0){
+      boss();
+     }else{
+      start();
+     }
+    }
+   },850);
+  }
+
+ }else{
+  combo=0;
+
+  // Kesalahan menyebabkan beast memecut dengan ketara
+  speed+=.055;
+
+  score=Math.max(0,score-5);
+
+  msg("⚠ OVERHEAT! "+n+" BUKAN FAKTOR "+maxHp);
+ }
+
+ updateUI();
 }
 
-if(hitFactors.size===fs.length){
-alive=false;
-clearInterval(tickId);
-$("beastNumber").textContent="";
-beastEl.classList.add("defeat");
-score+=100;
-level++;
-defeatSound();
-msg("🏆 SEMUA FAKTOR DITEMBAK! BEAST DITUMPASKAN!");
-
-setTimeout(()=>{
-if(!gameEnded){
-if(level%4===0)boss();
-else start();
-}
-},700);
-}
-}else{
-combo=0;
-speed+=.055;
-score=Math.max(0,score-5);
-msg("⚠️ OVERHEAT! "+n+" bukan faktor "+maxHp);
-}
-ui();
-}
-
-function flash(){
-modal(`<h2>💎 FACTOR BONUS</h2>
-<p>Apakah dua faktor yang sentiasa wujud bagi nombor <b>${maxHp}</b>?</p>
-<div class="formula">
-<button onclick="bonus(true)">1 dan ${maxHp}</button>
-<button onclick="bonus(false)">2 dan ${maxHp}</button>
-</div>`);
-}
-
-function bonus(ok){
-if(ok){score+=100;msg("BONUS +100");}
-else score=Math.max(0,score-25);
-closeModal();
-setTimeout(start,400);
-ui();
-}
+// PRIME CORE BOSS
 
 function boss(){
-bossSound();
-const n=[60,72,84,90,96,120][Math.floor(Math.random()*6)];
-const fs=pf(n);
+ clearInterval(tickId);
+ alive=false;
 
-modal(`
-<h2>👑 PRIME CORE BOSS — ${n}</h2>
-<p>Pecahkan sehingga semua daun menjadi nombor perdana.</p>
-<div class="formula">
-${pair(n).map(v=>`<span class="prime">${v}${prime(v)?" ★":" → "+pair(v).join(" × ")}</span>`).join("")}
-</div>
-<p>Susun Prime Core:</p>
-<div id="formula" class="formula">
-${[...fs].sort(()=>Math.random()-.5).map(v=>`<button onclick="pick(${v},this)">${v}</button>`).join("")}
-</div>
-<p id="status">Masa: 15 saat</p>
-<button class="play-again" onclick="restartBoss()">↻ RESTART BOSS</button>
-`);
+ bossSound();
 
-window.target=fs;
-window.pos=0;
-window.deadline=Date.now()+15000;
-clearInterval(window.bossTimer);
+ const n=[60,72,84,90,96,120][
+  Math.floor(Math.random()*6)
+ ];
 
-window.bossTimer=setInterval(()=>{
-let s=Math.ceil((window.deadline-Date.now())/1000);
-$("status").textContent="Masa: "+Math.max(0,s)+" saat";
-if(s<=0){
-clearInterval(window.bossTimer);
-$("status").textContent="💀 CORE JAMMED!";
-}
-},200);
+ bossTarget=primeFactors(n);
+ bossPosition=0;
+
+ const tree=factorPair(n);
+
+ modal(`
+  <h2>👑 PRIME CORE BOSS — ${n}</h2>
+
+  <p>Pecahkan nombor komposit sehingga semua daun menjadi nombor perdana.</p>
+
+  <div class="formula">
+   ${tree.map(v=>`
+    <span class="prime">
+     ${v}${prime(v)?" ★":" → "+factorPair(v).join(" × ")}
+    </span>
+   `).join("")}
+  </div>
+
+  <p>Susun faktor perdana mengikut turutan yang betul:</p>
+
+  <div id="formula" class="formula">
+   ${[...bossTarget]
+    .sort(()=>Math.random()-.5)
+    .map(v=>`<button onclick="pick(${v},this)">${v}</button>`)
+    .join("")}
+  </div>
+
+  <p id="status">Masa: 15 saat</p>
+
+  <button class="play-again" onclick="restartBoss()">
+   ↻ RESTART BOSS
+  </button>
+ `);
+
+ bossDeadline=Date.now()+15000;
+
+ clearInterval(bossTimer);
+
+ bossTimer=setInterval(()=>{
+  const seconds=Math.max(
+   0,
+   Math.ceil((bossDeadline-Date.now())/1000)
+  );
+
+  const status=$("status");
+  if(status){
+   status.textContent="Masa: "+seconds+" saat";
+  }
+
+  if(seconds<=0){
+   clearInterval(bossTimer);
+   if(status){
+    status.textContent="💀 MASA TAMAT! CORE JAMMED!";
+   }
+  }
+ },100);
 }
 
 function restartBoss(){
-clearInterval(window.bossTimer);
-boss();
+ clearInterval(bossTimer);
+ boss();
 }
 
-function pick(v,b){
-if(Date.now()>window.deadline)return;
+function pick(value,button){
+ if(Date.now()>bossDeadline)return;
 
-if(v===window.target[window.pos]){
-b.classList.add("ok");
-window.pos++;
-score+=25;
+ if(value===bossTarget[bossPosition]){
+  button.classList.add("ok");
+  button.disabled=true;
 
-if(window.pos===window.target.length){
-clearInterval(window.bossTimer);
-score+=250;
-closeModal();
-msg("🌟 PRIME CORE BERJAYA!");
-defeatSound();
-setTimeout(start,500);
+  bossPosition++;
+  score+=25;
+
+  if(bossPosition===bossTarget.length){
+   clearInterval(bossTimer);
+
+   score+=250;
+
+   closeModal();
+
+   msg("🌟 PRIME CORE BERJAYA!");
+   defeatSound();
+
+   updateUI();
+
+   setTimeout(()=>{
+    if(!gameEnded)start();
+   },500);
+  }
+ }else{
+  clearInterval(bossTimer);
+
+  const status=$("status");
+  if(status){
+   status.textContent="💀 SALAH! CORE JAMMED. KLIK RESTART.";
+  }
+
+  hurtSound();
+ }
+
+ updateUI();
 }
-}else{
-clearInterval(window.bossTimer);
-$("status").textContent="💀 SALAH! Core Jammed. Klik Restart.";
-hurtSound();
-}
-ui();
-}
+
+// MODAL
 
 function modal(html){
-$("modal").className="modal";
-$("modal").innerHTML=`<div class="modal-card">${html}</div>`;
+ $("modal").className="modal";
+
+ $("modal").innerHTML=`
+  <div class="modal-card">
+   ${html}
+  </div>
+ `;
 }
 
 function closeModal(){
-$("modal").className="modal hidden";
-$("modal").innerHTML="";
+ $("modal").className="modal hidden";
+ $("modal").innerHTML="";
 }
 
+// GAME OVER
+
 function triggerGameOver(){
-if(gameEnded)return;
-gameEnded=true;
-alive=false;
-clearInterval(tickId);
-clearInterval(musicTimer);
+ if(gameEnded)return;
 
-const cannon=document.querySelector(".cannon");
-cannon.classList.remove("cannon-explode");
-void cannon.offsetWidth;
-cannon.classList.add("cannon-explode");
+ gameEnded=true;
+ alive=false;
 
-explosionSound();
-$("message").textContent="💥 MERIAM DIMUSNAHKAN!";
-$("message").classList.add("show");
-setTimeout(gameOver,650);
+ clearInterval(tickId);
+ clearInterval(musicTimer);
+
+ const cannon=document.querySelector(".cannon");
+
+ cannon.classList.remove("cannon-explode");
+ void cannon.offsetWidth;
+ cannon.classList.add("cannon-explode");
+
+ explosionSound();
+
+ $("message").textContent="💥 MERIAM DIMUSNAHKAN!";
+ $("message").classList.add("show");
+
+ setTimeout(gameOver,700);
 }
 
 function gameOver(){
-modal(`
-<h2>☠️ GAME OVER</h2>
-<p>Beast telah memusnahkan meriam.</p>
-<p>Skor akhir: <b>${score}</b></p>
-<button class="play-again" onclick="resetGame()">▶ PLAY AGAIN</button>
-`);
+ modal(`
+  <h2>☠️ GAME OVER</h2>
+
+  <p>Beast telah memusnahkan meriam.</p>
+
+  <p>Level terakhir: <b>${level}</b></p>
+  <p>Skor akhir: <b>${score}</b></p>
+
+  <button class="play-again" onclick="resetGame()">
+   ▶ PLAY AGAIN
+  </button>
+ `);
 }
+
+// RESET
 
 function resetGame(){
-clearInterval(tickId);
-clearInterval(musicTimer);
-clearInterval(window.bossTimer);
+ clearInterval(tickId);
+ clearInterval(musicTimer);
+ clearInterval(bossTimer);
 
-gameEnded=false;
-score=0;
-base=100;
-level=1;
-combo=0;
-alive=true;
+ gameEnded=false;
 
-closeModal();
-document.querySelector(".cannon").classList.remove("cannon-explode");
-$("beast").classList.remove("hit","defeat");
-$("message").classList.remove("show");
-start();
+ score=0;
+ base=100;
+ level=1;
+ combo=0;
+
+ alive=true;
+
+ closeModal();
+
+ const cannon=document.querySelector(".cannon");
+ cannon.classList.remove("cannon-explode");
+
+ $("beast").classList.remove("hit","defeat");
+ $("message").classList.remove("show");
+
+ start();
+
+ if(musicOn)startMusic();
 }
+
+// KAWALAN AUDIO
 
 function toggleSound(){
-soundOn=!soundOn;
-$("soundToggle").textContent=soundOn?"🔊 SOUND ON":"🔇 SOUND OFF";
-if(soundOn){
-tone(520,.08);
-startMusic();
-}
+ soundOn=!soundOn;
+
+ $("soundToggle").textContent=
+  soundOn?"🔊 SOUND ON":"🔇 SOUND OFF";
+
+ if(soundOn){
+  tone(520,.08);
+ }
 }
 
 function toggleMusic(){
-musicOn=!musicOn;
-$("musicToggle").textContent=musicOn?"🎵 MUSIC ON":"🔇 MUSIC OFF";
-if(musicOn)startMusic();
-else clearInterval(musicTimer);
+ musicOn=!musicOn;
+
+ $("musicToggle").textContent=
+  musicOn?"🎵 MUSIC ON":"🔇 MUSIC OFF";
+
+ if(musicOn){
+  startMusic();
+ }else{
+  clearInterval(musicTimer);
+ }
 }
 
 $("restart").onclick=resetGame;
-$("soundToggle").onclick=()=>{ensureAudio();toggleSound();};
-$("musicToggle").onclick=()=>{ensureAudio();toggleMusic();};
 
-document.addEventListener("pointerdown",()=>{
-if(musicOn&&!gameEnded)startMusic();
-},{once:true});
+$("soundToggle").onclick=()=>{
+ ensureAudio();
+ toggleSound();
+};
+
+$("musicToggle").onclick=()=>{
+ ensureAudio();
+ toggleMusic();
+};
+
+// PENGENALAN PERMAINAN
 
 function showIntro(){
-clearInterval(tickId);
-alive=false;
+ clearInterval(tickId);
+ alive=false;
 
-modal(`
-<h2>🛡️ CARA BERMAIN — FACTOR CANNON</h2>
-<p><b>Segmen 1: Pertahanan Faktor</b></p>
-<ol>
-<li>Pilih nombor yang merupakan faktor bagi nombor pada beast.</li>
-<li>Setiap jawapan betul mengurangkan nyawa beast.</li>
-<li>Jawapan salah menyebabkan overheat dan beast bergerak lebih laju.</li>
-<li>Tumpaskan beast sebelum ia sampai ke kubu.</li>
-</ol>
-<p><b>Segmen 2: PRIME CORE BOSS</b></p>
-<ol>
-<li>Setiap 4 level, susun faktor perdana mengikut turutan yang dipaparkan.</li>
-<li>Pilih nombor satu demi satu sebelum masa tamat.</li>
-<li>Jika tersalah atau masa tamat, tekan RESTART BOSS untuk cuba semula.</li>
-</ol>
-<button class="play-again" onclick="beginMission()">▶ MULA BERMAIN</button>
-`);
+ modal(`
+  <h2>🛡️ CARA BERMAIN — PRIME SIEGE</h2>
+
+  <p><b>SEGMEN 1: PERTAHANAN FAKTOR</b></p>
+
+  <ol style="text-align:left">
+   <li>Pilih nombor yang merupakan faktor bagi nombor pada beast.</li>
+   <li>Setiap jawapan betul mengurangkan nyawa beast.</li>
+   <li>Semua faktor positif perlu ditembak untuk menumpaskan beast.</li>
+   <li>Jawapan salah menyebabkan overheat dan beast bergerak lebih laju.</li>
+   <li>Tumpaskan beast sebelum ia sampai ke meriam.</li>
+  </ol>
+
+  <p><b>SEGMEN 2: PRIME CORE BOSS</b></p>
+
+  <ol style="text-align:left">
+   <li>Setiap 4 level, pemain menghadapi PRIME CORE BOSS.</li>
+   <li>Kenal pasti pemfaktoran perdana nombor yang diberi.</li>
+   <li>Pilih faktor perdana mengikut turutan yang betul.</li>
+   <li>Selesaikan cabaran dalam masa 15 saat.</li>
+   <li>Jika tersalah atau masa tamat, tekan RESTART BOSS.</li>
+  </ol>
+
+  <p>🎵 Muzik bermula selepas pemain menekan butang mula.</p>
+
+  <button class="play-again" onclick="beginMission()">
+   ▶ MULA BERMAIN
+  </button>
+ `);
 }
 
 function beginMission(){
-closeModal();
-alive=true;
-start();
-if(musicOn)startMusic();
+ ensureAudio();
+
+ closeModal();
+ alive=true;
+
+ start();
+
+ if(musicOn)startMusic();
 }
 
+// MULA PERMAINAN
+
 showIntro();
+
 </script>
 </body>
 </html>
