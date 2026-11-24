@@ -1,0 +1,423 @@
+*{box-sizing:border-box}body{margin:0;background:#070b14;color:#edf5ff;font-family:Arial,system-ui,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 20%,#1b315344,transparent 55%)}
+.hud{height:82px;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;background:#0c1220;border-bottom:1px solid #27384f;position:sticky;top:0;z-index:20}
+h1{margin:0;font-size:25px;letter-spacing:3px;color:#78e9ff;text-shadow:0 0 18px #2bd9ff55}.hud p{margin:3px 0;color:#7489a5;font-size:11px;letter-spacing:2px}
+.stats{display:flex;gap:8px}.stats span{padding:8px 11px;border:1px solid #30445e;background:#111b2a;border-radius:9px;font-size:10px;color:#8194ad}.stats b{display:block;color:#fff;font-size:16px;margin-top:2px}
+main{max-width:1250px;margin:auto;padding:18px}.arena{height:510px;position:relative;overflow:hidden;border:1px solid #2c425d;border-radius:18px;background:#0b1422;box-shadow:0 20px 80px #0009}
+.sky{position:absolute;inset:0 0 42% 0;background:linear-gradient(#0b142a,#152844)}.moon{position:absolute;right:10%;top:12%;width:70px;height:70px;border-radius:50%;background:#d9e8ed;box-shadow:0 0 35px #cdefff66}.mountain{position:absolute;bottom:39%;width:55%;height:30%;background:#111b2c;clip-path:polygon(0 100%,30% 28%,46% 65%,66% 10%,100% 100%);opacity:.9}.m1{left:-5%}.m2{right:-10%;transform:scaleX(-1)}
+.ground{position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(#1a281f,#101914);border-top:2px solid #354d3d}
+.ground:after{content:"";position:absolute;left:8%;right:7%;top:48%;height:6px;background:#52674c;box-shadow:0 18px #1b3025}
+.cannon{position:absolute;right:7%;bottom:15%;width:250px;z-index:8;filter:drop-shadow(0 15px 12px #0009)}.cannon-label{position:absolute;bottom:-6px;left:55px;font-size:10px;letter-spacing:2px;color:#72e8ff;font-weight:bold}
+.beast{position:absolute;left:5%;bottom:13%;width:220px;height:230px;z-index:7;transition:left .08s linear;filter:drop-shadow(0 16px 10px #000b)}.beast svg{width:100%;height:100%}.beast strong{position:absolute;top:69px;left:0;right:0;text-align:center;font-size:26px;text-shadow:0 2px 3px #000}.beast small{position:absolute;top:99px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:2px;color:#ffd5d5}.beast-hp{position:absolute;top:-9px;left:12px;right:12px;height:9px;border-radius:9px;background:#25151c;border:1px solid #7a4050;overflow:hidden}.beast-hp i{display:block;height:100%;width:100%;background:#5cf48d;transition:.2s}
+.message{position:absolute;top:18px;left:50%;transform:translateX(-50%);background:#080d18ee;border:1px solid #45617d;padding:9px 15px;border-radius:20px;font-weight:bold;opacity:0;transition:.2s;z-index:15}.message.show{opacity:1}
+.control-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}.panel{background:#0d1625;border:1px solid #293c55;border-radius:15px;padding:15px}.panel h2{margin:0 0 8px;color:#8feeff;font-size:14px}.panel p,.panel li{color:#8da0b8;font-size:12px;line-height:1.6}.ammo{display:flex;gap:8px;flex-wrap:wrap}.ammo button{min-width:52px;padding:10px;border:1px solid #3b5572;background:#17263a;color:#eaf5ff;border-radius:9px;font-weight:bold}.ammo button:hover{background:#25415c}.ammo button:disabled{opacity:.25}.restart{margin-top:9px;border:0;background:#39d0ed;color:#03121b;padding:10px 15px;border-radius:8px;font-weight:bold}
+.modal{position:fixed;inset:0;background:#03060ddd;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}.hidden{display:none}.modal-card{max-width:650px;width:100%;background:#101b2d;border:1px solid #4a6686;border-radius:18px;padding:22px;text-align:center}.modal-card h2{color:#80ecff}.prime{display:inline-block;margin:5px;padding:11px 15px;border:1px solid #d7a93e;background:#382d13;color:#ffe18b;border-radius:9px;font-weight:bold}.formula button{margin:5px;padding:12px 17px;border-radius:9px;border:1px solid #49678a;background:#17263c;color:#fff;font-weight:bold}.formula button.ok{background:#4b3a13;border-color:#ffd45b;color:#ffe59b}
+@media(max-width:800px){.hud{height:auto;align-items:flex-start;gap:10px;flex-direction:column}.stats{flex-wrap:wrap}.arena{height:430px}.cannon{transform:scale(.72);transform-origin:bottom right;right:-2%}.beast{transform:scale(.72);transform-origin:bottom left;left:4%}.control-grid{grid-template-columns:1fr}}
+
+.audio-controls{display:flex;gap:7px;margin-left:auto}.audio-controls button{border:1px solid #38536e;background:#122033;color:#bcefff;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:bold}
+.beast.hit{animation:beastHit .22s ease}.beast.hit svg{filter:brightness(1.7) saturate(1.5)}@keyframes beastHit{0%{transform:translateX(0) rotate(0)}25%{transform:translateX(-9px) rotate(-3deg)}55%{transform:translateX(10px) rotate(3deg)}100%{transform:translateX(0) rotate(0)}}
+.beast.defeat{animation:beastDefeat .8s ease forwards}@keyframes beastDefeat{0%{transform:scale(1);opacity:1}55%{transform:scale(1.12) rotate(8deg);opacity:1}100%{transform:scale(.2) rotate(25deg);opacity:0}}
+.shot{position:absolute;width:16px;height:16px;border-radius:50%;background:#eaffff;box-shadow:0 0 12px #74ecff,0 0 30px #fff;z-index:12;pointer-events:none}
+.muzzle-flash{position:absolute;right:18%;bottom:31%;width:85px;height:85px;border-radius:50%;background:radial-gradient(circle,#fff 0 8%,#ffe46d 15%,#ff9c35 35%,transparent 68%);opacity:0;z-index:10;pointer-events:none}.muzzle-flash.fire{animation:muzzle .18s ease-out}@keyframes muzzle{0%{opacity:1;transform:scale(.5)}100%{opacity:0;transform:scale(1.35)}}
+.beast-nameplate{position:absolute;left:0;right:0;bottom:-18px;text-align:center;color:#ffd77a;font-weight:900;font-size:12px;letter-spacing:1.5px;text-shadow:0 2px 5px #000}
+@media(max-width:800px){.audio-controls{margin-left:0}}
+
+/* v3: dramatic cannon destruction and replay controls */
+.cannon.cannon-explode{animation:cannonExplosion .62s cubic-bezier(.2,.7,.3,1) forwards;transform-origin:65% 70%;filter:drop-shadow(0 0 18px #ff6b2b)}
+@keyframes cannonExplosion{
+ 0%{transform:translate(0,0) rotate(0) scale(1);opacity:1;filter:brightness(1)}
+ 18%{transform:translate(-7px,2px) rotate(-4deg) scale(1.04);filter:brightness(2)}
+ 38%{transform:translate(8px,-5px) rotate(5deg) scale(1.12);filter:brightness(2.8) drop-shadow(0 0 25px #ff5c24)}
+ 65%{transform:translate(-5px,-13px) rotate(-8deg) scale(.95);opacity:.8;filter:brightness(1.8)}
+ 100%{transform:translate(0,18px) rotate(14deg) scale(.55);opacity:0;filter:brightness(.5)}
+}
+.play-again{margin:12px auto 0;padding:13px 24px;border:0;border-radius:10px;background:linear-gradient(135deg,#62efff,#29b9e5);color:#04111c;font-weight:900;letter-spacing:1px;cursor:pointer;box-shadow:0 0 22px #39d0ed33}
+.play-again:hover{filter:brightness(1.12);transform:translateY(-1px)}
+
+/* Number classification shown under each beast's target number */
+.number-type{
+ display:block;
+ margin-top:3px;
+ font-size:clamp(8px,1vw,11px);
+ font-style:normal;
+ font-weight:800;
+ letter-spacing:.08em;
+ color:#9ff3ff;
+ text-shadow:0 1px 5px #07111d;
+}
+
+
+/* PRIME CORE: reactor stabilization boss interface */
+.core-shell{position:relative;overflow:hidden;padding:8px 4px 2px;background:radial-gradient(ellipse at 50% 30%,#173b58 0,#101d32 48%,#0a1222 100%);border-radius:14px}
+.core-shell:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 35%,#66eaff0b 50%,transparent 65%);animation:coreSweep 4s linear infinite}
+@keyframes coreSweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.core-topline{display:flex;justify-content:space-between;color:#7eeaff;font-size:10px;font-weight:900;letter-spacing:2px}
+.core-rank{color:#ffc76d}.core-shell h2{font-size:28px;letter-spacing:4px;margin:10px 0 2px;color:#a5f5ff;text-shadow:0 0 18px #3deaff88}
+.core-subtitle{margin:0 0 8px!important;color:#91a9c5!important;font-size:10px!important;letter-spacing:1.5px}
+.reactor-wrap{display:flex;justify-content:center;padding:8px 0 12px}
+.reactor-ring{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;border:4px solid #3b9eb5;box-shadow:0 0 0 7px #1b617455,0 0 32px #27dfff66,inset 0 0 20px #4beaff44;animation:reactorPulse 2s ease-in-out infinite}
+@keyframes reactorPulse{50%{box-shadow:0 0 0 11px #1b617422,0 0 45px #27dfff99,inset 0 0 28px #4beaff88}}
+.reactor-orb{width:82px;height:82px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 25%,#d9ffff,#4bd8ed 25%,#12618b 65%,#09223e);color:#061a2b;box-shadow:inset 0 -8px 18px #03132688,0 0 24px #59eaff88}
+.reactor-orb span{font-size:28px;font-weight:1000}.reactor-orb small{font-size:7px;font-weight:900;letter-spacing:1px}.reactor-orb.core-win{background:radial-gradient(circle,#fff7b5,#f6c84e 35%,#a85a13 80%);box-shadow:0 0 40px #ffd45b}
+.core-energy-head,.core-progress{display:flex;justify-content:space-between;color:#a9c1d8;font-size:10px;font-weight:800;letter-spacing:1px}
+.core-energy-head b{color:#75f3ff}.core-energy{height:9px;margin:6px 0 12px;background:#07101e;border:1px solid #31516b;border-radius:20px;overflow:hidden}.core-energy i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#38e5a2,#7df6ff);box-shadow:0 0 12px #53eaff;transition:width .25s}
+.core-instruction{color:#dcecff!important;margin:8px 0!important}.core-slots{display:flex;justify-content:center;align-items:center;gap:7px;margin:12px 0}.core-slot{width:44px;height:42px;display:grid;place-items:center;border:1px dashed #6e91aa;border-radius:9px;background:#0b1a2c;color:#7c9ab4;font-size:19px;font-weight:900}.core-slot.filled{background:linear-gradient(145deg,#245e64,#163e53);border:1px solid #74f2dc;color:#baffed;box-shadow:0 0 14px #41e7c455;animation:slotPop .25s ease}.core-times{color:#70dff1}.core-progress{margin:4px 0 8px}.core-choices{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0}.core-choice{min-width:48px;padding:12px 16px;border:1px solid #4c7695;border-radius:10px;background:linear-gradient(145deg,#1b3550,#102239);color:#e9fbff;font-size:17px;font-weight:900;cursor:pointer;transition:.15s}.core-choice:hover:not(:disabled){transform:translateY(-3px);border-color:#7cefff;box-shadow:0 0 15px #4adfff55}.core-choice:disabled{opacity:.35;cursor:default}.core-choice.core-correct{background:#164b48;border-color:#70e9c4;color:#baffdf;opacity:1}.core-choice.core-wrong{border-color:#ff6c6c;background:#5b202b;animation:wrongShake .3s}.core-status{min-height:24px;color:#8deeff!important;font-weight:700}.core-shell .play-again{position:relative;z-index:1}
+@keyframes slotPop{from{transform:scale(.65)}to{transform:scale(1)}}@keyframes wrongShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media(max-width:600px){.core-shell h2{font-size:23px}.core-slot{width:36px;height:38px}.core-choice{min-width:42px;padding:10px 13px}}
+
+/* PRIME CORE readability and mission briefing */
+.core-howto{padding:14px 12px 12px}
+.howto-badge{display:inline-block;margin:12px 0 4px;padding:8px 12px;border:1px solid #4c9eb5;border-radius:999px;background:#12364c;color:#9ff3ff;font-size:12px;font-weight:900;letter-spacing:.7px}
+.howto-steps{display:grid;gap:8px;margin:12px 0}
+.howto-steps>div{display:flex;align-items:flex-start;gap:11px;padding:9px 10px;border:1px solid #294b66;border-radius:10px;background:#0b1a2b}
+.howto-steps>div>b{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:8px;background:#174d62;color:#8ff3ff;font-size:12px}
+.howto-steps span{display:grid;gap:3px}.howto-steps strong{color:#e4f8ff;font-size:13px}.howto-steps small{color:#a9c1d8;font-size:11px;line-height:1.4}
+.howto-example{padding:10px;border-radius:9px;background:#102c3d;color:#c5f8ff;text-align:center;font-size:14px}
+.core-start{width:100%;margin-top:12px!important;font-size:14px!important;padding:14px!important}
+.core-progress{align-items:center;gap:12px;font-size:12px}
+.core-timer-wrap{display:flex;align-items:center;gap:8px;color:#a9c1d8;font-size:12px;font-weight:900}
+#coreTimer{display:inline-grid;place-items:center;min-width:92px;padding:7px 13px;border:2px solid #58e8ff;border-radius:12px;background:#08283b;color:#d9fbff;font-size:30px;line-height:1;font-weight:1000;letter-spacing:1px;text-shadow:0 0 12px #45eaff;box-shadow:0 0 16px #2bdcff55}
+#coreTimer.urgent{border-color:#ff8b65;color:#ffe0d5;background:#431d25;animation:timerPulse .6s ease-in-out infinite alternate}
+@keyframes timerPulse{to{transform:scale(1.06);box-shadow:0 0 20px #ff765b99}}
+@media(max-width:600px){.core-howto{padding:10px 8px}.howto-steps small{font-size:10px}#coreTimer{font-size:26px;min-width:82px}.core-progress{font-size:10px}}
+
+/* V4 visual overhaul: towering biped monsters, powered armor cannon and guided factor missiles */
+.beast{width:230px;height:260px;bottom:11%;}
+.beast svg{overflow:visible;animation:beastBodyBob .34s ease-in-out infinite alternate;transform-origin:50% 90%;}
+@keyframes beastBodyBob{from{transform:translateY(0)}to{transform:translateY(-2px)}}
+.beast-leg{transform-box:fill-box;transform-origin:50% 12%;}
+.beast-leg.leg-left{animation:beastLegWalk .42s ease-in-out infinite alternate;}
+.beast-leg.leg-right{animation:beastLegWalk .42s ease-in-out infinite alternate-reverse;}
+@keyframes beastLegWalk{from{transform:rotate(-17deg) translateY(-1px)}to{transform:rotate(17deg) translateY(2px)}}
+.beast.hit svg{animation:beastHit .22s ease!important}
+.beast.hit .beast-leg{animation-play-state:paused;}
+.beast strong{top:119px;font-size:25px;color:#fff1a8;text-shadow:0 0 10px #ff6a35,0 2px 4px #000;}
+.beast .number-type{position:absolute;top:148px;left:0;right:0;margin:0;text-align:center;font-size:8px;}
+.beast small{top:169px;font-size:9px;color:#ffd7a6;}
+.cannon{width:285px;bottom:12%;right:5%;filter:drop-shadow(0 0 13px #2ddfff55) drop-shadow(0 15px 12px #000b);}
+.cannon svg{overflow:visible;animation:cannonIdle 2.8s ease-in-out infinite;}
+@keyframes cannonIdle{50%{filter:brightness(1.12);transform:translateY(-2px)}}
+.cannon-label{left:48px;bottom:-8px;font-size:9px;letter-spacing:1.4px;color:#9ff6ff;text-shadow:0 0 9px #23dfff;}
+.shot.missile-projectile{width:31px;height:9px;border-radius:7px 3px 3px 7px;background:linear-gradient(180deg,#f6ffff 0%,#8cefff 40%,#2388bb 100%);border:1px solid #e1ffff;box-shadow:0 0 9px #72edff,0 0 20px #35cfff;transform-origin:center;}
+.shot.missile-projectile:before{content:"";position:absolute;right:-8px;top:-3px;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:10px solid #d9fbff;filter:drop-shadow(0 0 3px #55dfff);}
+.shot.missile-projectile:after{content:"";position:absolute;left:-12px;top:1px;width:13px;height:5px;background:linear-gradient(90deg,transparent,#ffb34d,#fff2a8);filter:blur(2px);}
+.ammo button.missile-ammo{position:relative;display:flex;align-items:center;gap:8px;min-width:72px;padding:9px 12px 9px 9px;background:linear-gradient(145deg,#203d58,#0c1d31);border:1px solid #4c91b2;box-shadow:inset 0 1px #bceeff22,0 4px 10px #0005;}
+.missile-mini{display:inline-block;position:relative;width:26px;height:8px;border-radius:7px 2px 2px 7px;background:linear-gradient(#f5ffff,#45c9ed 55%,#24618e);box-shadow:0 0 7px #47dfff;}
+.missile-mini:after{content:"";position:absolute;right:-6px;top:-2px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #d8faff;}
+.ammo button.missile-ammo b{font-size:16px;color:#e6fbff;}
+.ammo button.missile-ammo:disabled{opacity:.32;filter:grayscale(1);}
+@media(max-width:800px){.beast{width:190px;height:220px;transform:scale(.82);transform-origin:bottom left}.cannon{width:230px;transform:scale(.82);transform-origin:bottom right;right:-2%}.beast strong{top:102px;font-size:22px}.beast .number-type{top:128px}.beast small{top:148px}}
+
+/* Visible alternating two-leg walking cycle while the monster advances. */
+.beast:not(.defeat) .beast-leg{will-change:transform;}
+.beast.defeat .beast-leg{animation-play-state:paused!important;}
+
+/* V5: title screen, selectable difficulty and persistent local leaderboard */
+.modal{overflow-y:auto;align-items:center}
+.modal-card{max-height:calc(100vh - 32px);overflow-y:auto}
+.title-screen,.howto-screen,.leaderboard-screen,.end-screen{max-width:100%;margin:0 auto}
+.title-screen{padding:8px 4px 2px;background:radial-gradient(ellipse at 50% 0%,#1b5270 0,#101e34 48%,#0a1220 100%);border-radius:14px}
+.title-kicker{color:#78eaff;font-size:10px;font-weight:900;letter-spacing:2.5px}
+.title-emblem{width:62px;height:62px;display:grid;place-items:center;margin:12px auto 4px;border:2px solid #63eaff;border-radius:18px;background:linear-gradient(145deg,#1b4963,#102137);color:#d9fbff;font-size:34px;box-shadow:0 0 26px #3adfff55, inset 0 0 16px #3adfff22}
+.title-screen h2{margin:6px 0 0;font-size:clamp(32px,6vw,48px);letter-spacing:5px;color:#b7f7ff;text-shadow:0 0 22px #39dfff88}
+.title-subtitle{color:#ffcf75;font-weight:900;letter-spacing:3px;font-size:12px}
+.title-tagline{margin:12px auto 18px!important;color:#a8c4dc!important;font-size:11px!important;letter-spacing:1px;line-height:1.6}
+.title-label{display:block;text-align:left;max-width:440px;margin:12px auto 5px;color:#8deeff;font-size:10px;font-weight:900;letter-spacing:1.5px}
+#playerNameInput,#difficultySelect{display:block;width:100%;max-width:440px;margin:0 auto;padding:12px 13px;border:1px solid #426581;border-radius:9px;background:#09192a;color:#eafaff;font-size:14px;outline:none}
+#playerNameInput:focus,#difficultySelect:focus{border-color:#71efff;box-shadow:0 0 0 3px #3bdcff22}
+#difficultySelect option{background:#102033;color:#eafaff}
+.difficulty-hints{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px auto;color:#a9c6dc;font-size:9px;font-weight:900;letter-spacing:.7px}
+.title-start{display:block;width:100%;max-width:440px;margin:16px auto 10px!important;padding:15px!important;font-size:15px!important;letter-spacing:1.5px}
+.title-buttons,.end-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:10px 0}
+.secondary-action{padding:11px 15px;border:1px solid #42647e;border-radius:9px;background:#142b42;color:#bcefff;font-weight:900;cursor:pointer}
+.secondary-action:hover{border-color:#7deeff;background:#1b3a55}
+.title-record{max-width:520px;margin:17px auto 0;padding-top:12px;border-top:1px solid #34506b}
+.title-record> b{display:block;margin-bottom:8px;color:#ffdb8b;font-size:10px;letter-spacing:2px}
+.leaderboard-table{width:100%;max-width:560px;margin:12px auto 16px;border:1px solid #294a66;border-radius:10px;overflow:hidden;background:#091727;text-align:left}
+.leaderboard-row{display:grid;grid-template-columns:28px minmax(70px,1.5fr) minmax(48px,.8fr) 48px 70px;gap:7px;align-items:center;padding:9px 10px;border-bottom:1px solid #20394f;color:#c7d9e8;font-size:11px}
+.leaderboard-row:last-child{border-bottom:0}
+.leaderboard-row strong{color:#9ff6ff;font-size:13px}
+.leaderboard-row small{color:#ffcf75;font-size:9px;font-weight:900}
+.leaderboard-head{background:#142d43;color:#82eaff;font-size:9px;font-weight:900;letter-spacing:.7px}
+.leaderboard-empty{padding:15px;border:1px dashed #42647e;border-radius:9px;color:#9db5ca!important;font-size:12px!important}
+.howto-screen h2,.leaderboard-screen h2,.end-screen h2{margin:7px 0 12px;color:#9ff2ff}
+.howto-screen{text-align:left}
+.howto-screen>p{color:#c7d9e8;font-size:12px;line-height:1.5}
+.howto-screen ol{padding-left:22px;color:#a9bfd4;font-size:12px;line-height:1.7}
+.howto-screen .secondary-action,.leaderboard-screen .secondary-action{display:block;margin:15px auto 0}
+.leaderboard-screen>p{color:#9db5ca;font-size:12px}
+.end-kicker{color:#ff9d72;font-size:10px;font-weight:900;letter-spacing:2px}
+.final-score{display:grid;gap:4px;max-width:300px;margin:14px auto;padding:14px;border:1px solid #4a708c;border-radius:12px;background:linear-gradient(145deg,#102b42,#0b192a);box-shadow:0 0 24px #35dfff22}
+.final-score small{color:#8db2cb;font-size:9px;font-weight:900;letter-spacing:2px}
+.final-score strong{color:#fff2a8;font-size:38px;text-shadow:0 0 15px #ffbf4b66}
+.final-score span,.rank-note{color:#9fc2d9;font-size:11px}
+.rank-note b{color:#ffe08b}
+.end-screen h3{color:#8feeff;font-size:12px;letter-spacing:1.5px}
+.end-screen .play-again{margin:0}
+@media(max-width:600px){
+ .modal{padding:8px;align-items:flex-start}
+ .modal-card{padding:13px;max-height:calc(100vh - 16px)}
+ .title-screen h2{letter-spacing:3px}
+ .leaderboard-row{grid-template-columns:22px minmax(55px,1.3fr) minmax(42px,.8fr) 34px 55px;gap:4px;padding:8px 6px;font-size:10px}
+ .leaderboard-row small{font-size:8px}
+ .difficulty-hints{gap:8px;font-size:8px}
+}
+
+/* V6 stability: keep the cannon mounted and visible outside its one-shot destruction animation. */
+.cannon{display:block;visibility:visible;backface-visibility:hidden;}
+.cannon svg{display:block;}
+
+/* V7: fit the entire battle UI into the viewport; monster, cannon and missiles stay visible together. */
+html,body{width:100%;height:100%;min-height:0;}
+body{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;}
+.hud{flex:0 0 76px;height:76px;min-height:76px;padding:8px 16px;gap:12px;}
+.hud h1{font-size:21px;}
+main{width:100%;max-width:1400px;flex:1;min-height:0;height:auto;margin:0 auto;padding:8px 12px 10px;display:grid;grid-template-rows:minmax(0,1fr) 132px;gap:8px;}
+.arena{height:auto;min-height:0;width:100%;}
+.control-grid{height:132px;min-height:0;margin:0;grid-template-columns:minmax(0,1.65fr) minmax(210px,.8fr);gap:8px;}
+.control-grid .panel{min-height:0;overflow:hidden;padding:9px 12px;}
+.control-grid .panel h2{margin:0 0 5px;font-size:12px;}
+.control-grid .panel p,.control-grid .panel li{font-size:10px;line-height:1.35;margin:2px 0;}
+.control-grid .panel ol{margin:3px 0 4px;padding-left:18px;}
+.control-grid .restart{margin-top:2px;padding:6px 10px;font-size:10px;}
+.ammo{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;overflow:visible;}
+.ammo button.missile-ammo{min-width:0;flex:1 1 0;justify-content:center;padding:8px 5px;gap:5px;}
+.ammo button.missile-ammo b{font-size:14px;}
+.missile-mini{width:22px;flex:0 0 22px;}
+.cannon-blast{position:absolute;z-index:18;right:8%;bottom:9%;width:220px;height:220px;pointer-events:none;border-radius:50%;transform:translate(10%,8%) scale(.18);background:radial-gradient(circle,#fff 0 5%,#fff7c2 8%,#ffd34d 16%,#ff7a21 31%,#e52b12 47%,#9b160e 60%,transparent 72%);filter:drop-shadow(0 0 24px #ff5a18);animation:blastExpand .95s cubic-bezier(.12,.65,.25,1) forwards;}
+.cannon-blast:before,.cannon-blast:after{content:"";position:absolute;inset:-18%;border:8px solid #ffb33c;border-radius:50%;opacity:0;animation:blastShock .85s ease-out forwards;}
+.cannon-blast:after{inset:12%;border-width:4px;border-color:#fff1a0;animation-delay:.08s;}
+@keyframes blastExpand{0%{opacity:0;transform:translate(10%,8%) scale(.12)}12%{opacity:1}48%{opacity:1;transform:translate(10%,8%) scale(1.15)}100%{opacity:0;transform:translate(10%,8%) scale(1.5)}}
+@keyframes blastShock{0%{opacity:.9;transform:scale(.25)}100%{opacity:0;transform:scale(1.6)}}
+.cannon.cannon-explode{z-index:19;animation:cannonExplosion .68s cubic-bezier(.2,.7,.3,1) forwards;}
+@media(max-width:900px){
+ .hud{flex-basis:62px;height:62px;min-height:62px;padding:6px 9px;flex-direction:row;align-items:center;gap:7px;}
+ .hud h1{font-size:16px;letter-spacing:1.5px;}
+ .hud p{font-size:8px;letter-spacing:1px;}
+ .stats{gap:4px;flex-wrap:nowrap;}
+ .stats span{padding:5px 6px;font-size:8px;}
+ .stats b{font-size:12px;}
+ .audio-controls{margin-left:auto;gap:4px;}
+ .audio-controls button{padding:6px 7px;font-size:8px;}
+ main{padding:5px;grid-template-rows:minmax(0,1fr) 112px;gap:5px;}
+ .arena{border-radius:11px;}
+ .control-grid{height:112px;grid-template-columns:minmax(0,1fr);}
+ .control-grid .panel{padding:7px 8px;}
+ .control-grid .panel:nth-child(2){display:none;}
+ .control-grid .panel h2{font-size:10px;margin-bottom:4px;}
+ .control-grid .panel p{display:none;}
+ .ammo{gap:5px;}
+ .ammo button.missile-ammo{padding:7px 4px;}
+ .ammo button.missile-ammo b{font-size:13px;}
+ .beast{width:clamp(135px,24vw,190px);height:auto;aspect-ratio:230/260;bottom:9%;transform:none;}
+ .beast strong{top:39%;font-size:clamp(17px,3vw,22px);}
+ .beast .number-type{position:absolute;top:51%;font-size:8px;}
+ .beast small{top:61%;font-size:7px;}
+ .cannon{width:clamp(175px,30vw,230px);height:auto;bottom:8%;right:1%;transform:none;}
+ .cannon-label{font-size:7px;left:32px;}
+ .cannon-blast{width:160px;height:160px;right:3%;bottom:5%;}
+}
+@media(max-width:600px){
+ .hud{flex-basis:58px;height:58px;min-height:58px;}
+ .hud>div:first-child{min-width:100px;}
+ .hud h1{font-size:14px;}
+ .hud p{display:none;}
+ .stats span:nth-child(2),.stats span:nth-child(4),.stats span:nth-child(5){display:none;}
+ .stats span{padding:4px 6px;}
+ .audio-controls button{font-size:0;padding:6px 8px;}
+ main{grid-template-rows:minmax(0,1fr) 104px;}
+ .control-grid{height:104px;}
+ .ammo{gap:4px;}
+ .ammo button.missile-ammo{flex:1 1 0;min-width:0;padding:7px 2px;}
+ .missile-mini{width:17px;flex-basis:17px;height:6px;}
+ .ammo button.missile-ammo b{font-size:12px;}
+ .beast{width:clamp(120px,34vw,165px);bottom:8%;}
+ .cannon{width:clamp(155px,39vw,195px);right:0;bottom:7%;}
+ .beast strong{font-size:17px;}
+ .beast small{font-size:6px;letter-spacing:1px;}
+}
+@media(max-height:650px){
+ .hud{flex-basis:54px;height:54px;min-height:54px;}
+ main{grid-template-rows:minmax(0,1fr) 94px;padding-top:4px;padding-bottom:4px;gap:4px;}
+ .control-grid{height:94px;}
+ .control-grid .panel{padding:5px 8px;}
+ .ammo button.missile-ammo{padding:5px 3px;}
+}
+
+/* V8: cinematic monster-attack city backdrop */
+.arena{isolation:isolate;background:linear-gradient(180deg,#111b2c 0%,#293343 48%,#151a20 100%)}
+.sky{background:linear-gradient(180deg,#10192b 0%,#303746 58%,#4a302b 100%)}
+.moon{opacity:.48;background:#d8c9ad;box-shadow:0 0 45px #ffb36a66}
+.city-ruins{position:absolute;z-index:2;left:0;right:0;bottom:34%;height:48%;pointer-events:none;overflow:hidden;background:
+ linear-gradient(90deg,transparent 0 3%,#111923 3% 8%,transparent 8% 11%,#18202a 11% 18%,transparent 18% 22%,#111923 22% 29%,transparent 29% 34%,#1b222b 34% 42%,transparent 42% 47%,#131b25 47% 54%,transparent 54% 58%,#1a2029 58% 66%,transparent 66% 71%,#111923 71% 79%,transparent 79% 83%,#1a222d 83% 91%,transparent 91% 95%,#111923 95% 100%);
+ clip-path:polygon(0 24%,5% 24%,5% 0,11% 0,11% 17%,18% 17%,18% 6%,24% 6%,24% 29%,31% 29%,31% 12%,38% 12%,38% 24%,46% 24%,46% 3%,53% 3%,53% 20%,61% 20%,61% 8%,69% 8%,69% 27%,76% 27%,76% 0,84% 0,84% 18%,91% 18%,91% 10%,97% 10%,97% 25%,100% 25%,100% 100%,0 100%);
+ opacity:.96;filter:drop-shadow(0 8px 12px #000b)}
+.city-ruins:before{content:"";position:absolute;inset:10% 0 0;background:
+ repeating-linear-gradient(90deg,transparent 0 23px,#ffb45a55 24px 27px,transparent 28px 43px),
+ repeating-linear-gradient(0deg,transparent 0 17px,#ffbd6540 18px 20px,transparent 21px 34px);
+ mask-image:linear-gradient(90deg,#000 0 18%,transparent 24% 29%,#000 34% 62%,transparent 69% 74%,#000 80%);opacity:.48}
+.city-ruins:after{content:"";position:absolute;left:0;right:0;bottom:0;height:22%;background:linear-gradient(180deg,transparent,#080d13 75%);box-shadow:0 -12px 35px #ff6b3022}
+.ruin-smoke{position:absolute;bottom:45%;width:110px;height:130px;border-radius:50%;background:radial-gradient(ellipse,#59616a99 0%,#333c4880 42%,transparent 72%);filter:blur(13px);animation:smokeRise 5s ease-in-out infinite alternate}
+.smoke-one{left:17%}.smoke-two{right:23%;animation-delay:-2.4s;transform:scale(1.3)}
+.ruin-fire{position:absolute;bottom:0;width:35px;height:48px;background:radial-gradient(ellipse at 50% 80%,#fff5a8 0 8%,#ffb12e 24%,#ed4d20 48%,transparent 73%);filter:blur(2px);animation:ruinFlame .34s ease-in-out infinite alternate}
+.fire-one{left:28%}.fire-two{right:16%;transform:scale(1.4);animation-delay:-.2s}
+.ruin-dust{position:absolute;bottom:0;left:0;right:0;height:18%;background:linear-gradient(90deg,#8b493322,transparent 25%,#e17b2b22 60%,transparent);filter:blur(10px)}
+@keyframes smokeRise{from{transform:translateY(15px) scale(.8);opacity:.35}to{transform:translateY(-28px) scale(1.35);opacity:.8}}
+@keyframes ruinFlame{from{transform:scaleX(.8) scaleY(.8);opacity:.7}to{transform:scaleX(1.2) scaleY(1.25);opacity:1}}
+.ground{z-index:3;background:linear-gradient(#34302b,#17191b 55%,#0c1118);border-top:2px solid #685046}
+.ground:after{background:#4b4037;box-shadow:0 18px #242326}
+
+/* V8: keep monster locomotion running through impact reactions. */
+.beast{will-change:left,transform}
+.beast:not(.defeat) svg{animation:beastCinematicStride .48s ease-in-out infinite alternate;transform-origin:50% 88%}
+@keyframes beastCinematicStride{0%{transform:translateY(0) rotate(-1deg) scaleX(.99)}45%{transform:translateY(-3px) rotate(1deg) scaleX(1.005)}100%{transform:translateY(0) rotate(-.5deg) scaleX(1)}}
+.beast.hit svg{filter:brightness(1.7) saturate(1.5);animation:beastHit .22s ease!important}
+.beast.hit .beast-leg{animation-play-state:running!important}
+.beast:not(.defeat) .beast-leg{animation-duration:.38s!important}
+.beast:not(.defeat) .beast-leg.leg-left{animation-name:beastLegWalkHeavy!important}
+.beast:not(.defeat) .beast-leg.leg-right{animation-name:beastLegWalkHeavy!important;animation-direction:alternate-reverse!important}
+@keyframes beastLegWalkHeavy{0%{transform:rotate(-22deg) translateY(1px)}45%{transform:rotate(0deg) translateY(-4px)}100%{transform:rotate(23deg) translateY(2px)}}
+
+/* Animated worked example inside PRIME CORE briefing */
+.core-demo{display:flex;align-items:center;justify-content:center;gap:clamp(3px,1.4vw,12px);margin:12px auto 7px;flex-wrap:nowrap;max-width:100%;overflow:hidden}
+.demo-number{display:grid;place-items:center;width:clamp(30px,5vw,43px);height:clamp(30px,5vw,43px);flex:0 1 43px;border:1px solid #5bdcf4;border-radius:9px;background:linear-gradient(145deg,#1a4c68,#10283e);color:#e8fcff;font-weight:1000;font-size:clamp(14px,2.5vw,19px);box-shadow:0 0 12px #38dfff33;animation:demoPulse 4.8s ease-in-out infinite;opacity:.45;transform:scale(.88)}
+.demo-op{font-size:clamp(9px,1.7vw,12px);font-weight:900;color:#9af3ff;opacity:.35;animation:demoOp 4.8s ease-in-out infinite}
+.n1{animation-delay:0s}.op1{animation-delay:.65s}.n2{animation-delay:.9s}.op2{animation-delay:1.55s}.n3{animation-delay:1.8s}.op3{animation-delay:2.45s}.n4{animation-delay:2.7s}.op4{animation-delay:3.35s}.n5{animation-delay:3.6s}
+@keyframes demoPulse{0%,8%{opacity:.35;transform:scale(.88)}14%,30%{opacity:1;transform:scale(1.08);background:linear-gradient(145deg,#267a83,#16445b);box-shadow:0 0 19px #4fffe488}38%,100%{opacity:.45;transform:scale(.9)}}
+@keyframes demoOp{0%,12%{opacity:.2;transform:translateX(-4px)}20%,35%{opacity:1;transform:translateX(0)}45%,100%{opacity:.3}}
+.demo-caption{display:block;color:#b7e9f2;font-size:10px;letter-spacing:.35px}
+@media(max-width:520px){.city-ruins{bottom:34%;height:43%}.core-demo{gap:3px}.demo-caption{font-size:8px}.howto-example{padding:8px 4px}}
+
+
+/* V9 — larian raksasa sinematik: langkah panjang, hayunan tangan bertentangan,
+   lantunan badan, hentakan tapak kaki dan condongan ke hadapan. */
+.beast:not(.defeat) svg{animation:raksasaBerlari .34s ease-in-out infinite;transform-origin:50% 88%;}
+.beast:not(.defeat) .beast-leg{transform-box:fill-box;transform-origin:50% 10%;will-change:transform;}
+.beast:not(.defeat) .beast-leg.leg-left{animation:langkahKiri .34s cubic-bezier(.42,0,.58,1) infinite;}
+.beast:not(.defeat) .beast-leg.leg-right{animation:langkahKanan .34s cubic-bezier(.42,0,.58,1) infinite;}
+.beast:not(.defeat) .beast-arm{transform-box:fill-box;transform-origin:82% 18%;will-change:transform;}
+.beast:not(.defeat) .beast-arm.arm-left{animation:hayunTanganKiri .34s ease-in-out infinite;}
+.beast:not(.defeat) .beast-arm.arm-right{animation:hayunTanganKanan .34s ease-in-out infinite;}
+@keyframes raksasaBerlari{
+  0%,100%{transform:translateY(1px) rotate(1.2deg) scaleY(.985)}
+  25%{transform:translateY(-7px) rotate(-1.8deg) scaleY(1.015)}
+  50%{transform:translateY(1px) rotate(1.6deg) scaleY(.98)}
+  75%{transform:translateY(-5px) rotate(-1.2deg) scaleY(1.01)}
+}
+@keyframes langkahKiri{
+  0%{transform:rotate(29deg) translate(-5px,-2px)}
+  25%{transform:rotate(4deg) translate(0,-8px)}
+  50%{transform:rotate(-31deg) translate(7px,3px)}
+  75%{transform:rotate(-4deg) translate(0,-5px)}
+  100%{transform:rotate(29deg) translate(-5px,-2px)}
+}
+@keyframes langkahKanan{
+  0%{transform:rotate(-31deg) translate(7px,3px)}
+  25%{transform:rotate(-4deg) translate(0,-5px)}
+  50%{transform:rotate(29deg) translate(-5px,-2px)}
+  75%{transform:rotate(4deg) translate(0,-8px)}
+  100%{transform:rotate(-31deg) translate(7px,3px)}
+}
+@keyframes hayunTanganKiri{
+  0%,100%{transform:rotate(-27deg)}25%{transform:rotate(17deg)}50%{transform:rotate(30deg)}75%{transform:rotate(-15deg)}
+}
+@keyframes hayunTanganKanan{
+  0%,100%{transform:rotate(27deg)}25%{transform:rotate(-17deg)}50%{transform:rotate(-30deg)}75%{transform:rotate(15deg)}
+}
+.beast.hit:not(.defeat) svg{animation:raksasaKenaHentam .2s ease!important;}
+.beast.hit:not(.defeat) .beast-leg,.beast.hit:not(.defeat) .beast-arm{animation-play-state:running!important;}
+@keyframes raksasaKenaHentam{0%{transform:translateX(0) rotate(0)}30%{transform:translateX(-8px) rotate(-3deg)}65%{transform:translateX(5px) rotate(2deg)}100%{transform:translateX(0) rotate(1deg)}}
+.beast.defeat svg,.beast.defeat .beast-leg,.beast.defeat .beast-arm{animation-play-state:paused!important;}
+
+/* V12: bala bantuan raksasa untuk aras tinggi */
+.beast-pack-ally{pointer-events:none;filter:drop-shadow(0 12px 8px #000b) brightness(.82) saturate(.9);opacity:.94;transition:left .08s linear;}
+.beast-pack-ally svg{animation:raksasaBerlari .34s ease-in-out infinite!important;}
+.beast-pack-ally .beast-leg.leg-left{animation:langkahKiri .34s cubic-bezier(.42,0,.58,1) infinite!important;}
+.beast-pack-ally .beast-leg.leg-right{animation:langkahKanan .34s cubic-bezier(.42,0,.58,1) infinite!important;}
+
+/* V13: nombor dan nama unik untuk setiap raksasa bala bantuan */
+.beast-pack-ally .pack-number-badge,
+.beast-pack-ally .pack-name-badge{
+ position:absolute;left:50%;transform:translateX(-50%);z-index:12;
+ display:block;white-space:nowrap;text-align:center;pointer-events:none;
+ text-shadow:0 2px 5px #000,0 0 8px #000;
+}
+.beast-pack-ally .pack-number-badge{
+ top:-17px;min-width:34px;padding:2px 7px;border:1px solid #ffd36a;
+ border-radius:7px;background:#101c32;color:#fff2a8;font-size:17px;font-weight:1000;
+}
+.beast-pack-ally .pack-name-badge{
+ bottom:-16px;max-width:120px;overflow:hidden;text-overflow:ellipsis;
+ color:#fff;font-size:8px;font-weight:900;letter-spacing:.3px;
+}
+
+
+/* V14 — suasana bandar perang yang lebih berlapis dan aset tempur lebih berperincian */
+.city-ruins{isolation:isolate;background:
+ linear-gradient(180deg,#111a29 0%,#1b2633 56%,#302a2b 100%),
+ repeating-linear-gradient(90deg,transparent 0 35px,#0a111c 36px 39px);}
+.city-ruins .city-blast-glow{position:absolute;right:19%;bottom:18%;width:150px;height:110px;
+ background:radial-gradient(ellipse,#ff8b36a8 0%,#d7432266 35%,transparent 72%);
+ filter:blur(13px);animation:blastPulse 2.4s ease-in-out infinite alternate;z-index:-1}
+.ruined-tower{position:absolute;bottom:7%;width:13%;height:83%;background:
+ linear-gradient(90deg,#090f19 0 12%,#303945 13% 17%,#121c29 18% 83%,#050a12 84%);
+ border:2px solid #59616b;border-bottom:0;clip-path:polygon(0 0,100% 8%,96% 100%,5% 100%);
+ box-shadow:inset 0 0 20px #000,0 0 14px #000;opacity:.96}
+.ruined-tower:before{content:"";position:absolute;inset:12% 12% 8%;
+ background:repeating-linear-gradient(0deg,transparent 0 17px,#f0a65a55 18px 21px,transparent 22px 29px),
+ repeating-linear-gradient(90deg,transparent 0 15px,#050a12 16px 20px,transparent 21px 29px);
+ opacity:.75}
+.ruined-tower:after{content:"";position:absolute;left:48%;top:0;width:4px;height:100%;
+ background:linear-gradient(transparent,#080d16 22%,#68717a 24%,transparent 30%,#080d16 33%,transparent);
+ transform:rotate(7deg)}
+.tower-left{left:4%;height:72%;width:12%;transform:rotate(-3deg)}
+.tower-left i,.tower-right i{position:absolute;top:0;left:18%;width:64%;height:18%;
+ background:#202a37;clip-path:polygon(0 0,100% 12%,76% 100%,16% 82%)}
+.tower-left b,.tower-right b{position:absolute;left:34%;top:43%;width:38%;height:5%;
+ background:#ff9a48;box-shadow:0 0 15px #ff6b27;transform:rotate(-13deg)}
+.tower-right{right:3%;height:92%;width:14%;transform:rotate(3deg);clip-path:polygon(8% 0,100% 5%,94% 100%,0 100%,4% 35%)}
+.collapsed-bridge{position:absolute;left:22%;bottom:14%;width:28%;height:17%;
+ border-top:9px solid #50545a;border-bottom:5px solid #151a20;
+ transform:skewY(-13deg) rotate(-5deg);filter:drop-shadow(0 8px 5px #000)}
+.collapsed-bridge:before,.collapsed-bridge:after{content:"";position:absolute;top:-15px;width:8px;height:55px;background:#414951}
+.collapsed-bridge:before{left:18%;transform:rotate(22deg)}.collapsed-bridge:after{right:8%;transform:rotate(-25deg)}
+.wrecked-car{position:absolute;right:26%;bottom:5%;width:95px;height:25px;border-radius:18px 22px 5px 5px;
+ background:linear-gradient(180deg,#68717a 0 25%,#29323b 26% 75%,#10151c 76%);
+ border:2px solid #080d13;transform:skewX(-14deg);box-shadow:0 7px 5px #000}
+.wrecked-car:before{content:"";position:absolute;left:17px;top:-12px;width:48px;height:15px;
+ background:#303b47;clip-path:polygon(20% 0,82% 0,100% 100%,0 100%)}
+.wrecked-car:after{content:"";position:absolute;left:13px;bottom:-8px;width:17px;height:17px;border-radius:50%;
+ background:#080b10;border:4px solid #69727a;box-shadow:53px 0 #080b10,53px 0 0 4px #69727a}
+.street-debris{position:absolute;bottom:5%;height:13px;background:#6a5549;box-shadow:0 4px 0 #17191b;transform:rotate(-12deg)}
+.debris-one{left:13%;width:54px}.debris-two{left:57%;width:38px;transform:rotate(19deg)}
+.searchlight{position:absolute;right:10%;top:-18%;width:28%;height:125%;
+ background:linear-gradient(180deg,#c6e9ff22,transparent 76%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);
+ transform:rotate(15deg);transform-origin:top;opacity:.55;animation:searchSweep 7s ease-in-out infinite alternate}
+.ruin-fire{z-index:3;filter:blur(1px) drop-shadow(0 0 13px #ff5b20)}
+.ruin-smoke{z-index:4;background:radial-gradient(ellipse,#89909a99 0%,#48515d80 38%,#242c38 55%,transparent 73%);mix-blend-mode:screen}
+@keyframes blastPulse{from{opacity:.45;transform:scale(.8)}to{opacity:.95;transform:scale(1.18)}}
+@keyframes searchSweep{from{transform:rotate(8deg);opacity:.25}to{transform:rotate(-15deg);opacity:.65}}
+
+/* Meriam berperisai: lapisan logam, sambungan, haba muncung dan hentakan recoil */
+.cannon{filter:drop-shadow(0 17px 13px #000c) drop-shadow(0 0 7px #4adfff22)}
+.cannon svg{overflow:visible;transform-origin:74% 58%;animation:cannonIdle 3.1s ease-in-out infinite}
+.cannon svg:focus{outline:none}
+.cannon:before{content:"";position:absolute;z-index:2;left:34%;bottom:20%;width:38%;height:9%;
+ border-radius:8px;background:repeating-linear-gradient(90deg,#101b29 0 6px,#72869a 7px 9px);
+ border:1px solid #91a9bd;box-shadow:0 0 8px #000}
+.cannon:after{content:"";position:absolute;z-index:3;right:8%;top:35%;width:12%;height:20%;
+ border-radius:50%;background:radial-gradient(circle,#eaffff 0 12%,#54eaff 24%,#0c3c59 58%,#07111d 72%);
+ box-shadow:0 0 12px #37dcff,0 0 26px #159dcc66;pointer-events:none}
+.cannon-label{text-shadow:0 0 8px #20cfff,0 2px 4px #000;letter-spacing:1.6px}
+.cannon.cannon-fire svg{animation:cannonRecoil .16s ease-out}
+@keyframes cannonRecoil{0%{transform:translateX(0)}35%{transform:translateX(-9px)}100%{transform:translateX(0)}}
+
+/* Raksasa: tekstur berlapis, bayang anggota badan dan kilauan mata lebih jelas */
+.beast{filter:drop-shadow(0 17px 12px #000d) drop-shadow(0 0 5px #ff6c4540)}
+.beast svg{filter:contrast(1.12) saturate(1.12) drop-shadow(0 0 2px #ffad7a66)}
+.beast:not(.defeat) .beast-leg{filter:drop-shadow(0 4px 2px #0008)}
+.beast:not(.defeat) .beast-arm{filter:drop-shadow(0 3px 2px #0008)}
+.beast strong{color:#fff2c2;text-shadow:0 2px 4px #000,0 0 12px #ff733f88}
+.beast small{color:#ffe1c8;text-shadow:0 2px 4px #000;letter-spacing:1.5px}
+.beast.hit:not(.defeat) svg{filter:brightness(1.8) contrast(1.2) saturate(1.5) drop-shadow(0 0 12px #ff6a36)}
+@media(max-width:650px){.ruined-tower{opacity:.72}.wrecked-car{transform:scale(.7);transform-origin:bottom right}.collapsed-bridge{width:22%}}
